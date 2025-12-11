@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefWidth="500.0" spacing="20.0" styleClass="card" stylesheets="@../css/app-theme.css" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gestaoeventos.client.controller.DetalhesEventoController">
+
+    <padding><Insets bottom="30" left="30" right="30" top="30"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label fx:id="lblTipo" text="WORKSHOP" style="-fx-font-size: 10px; -fx-text-fill: #a1a1aa; -fx-font-weight: bold;"/>
+            <Label fx:id="lblTitulo" text="Título do Evento" styleClass="h1" wrapText="true"/>
+        </VBox>
+        <Label fx:id="lblEstado" text="PUBLICADO" styleClass="badge, badge-publicado"/>
+    </HBox>
+
+    <Separator style="-fx-background-color: #27272a;"/>
+
+    <VBox spacing="10">
+        <HBox spacing="10">
+            <Label text="📅 Data:" styleClass="text-muted" minWidth="80"/>
+            <Label fx:id="lblData" text="01/01/2025 10:00" style="-fx-text-fill: white;"/>
+        </HBox>
+        <HBox spacing="10">
+            <Label text="📍 Local:" styleClass="text-muted" minWidth="80"/>
+            <Label fx:id="lblLocal" text="Auditório A" style="-fx-text-fill: white;"/>
+        </HBox>
+        <HBox spacing="10">
+            <Label text="👥 Vagas:" styleClass="text-muted" minWidth="80"/>
+            <Label fx:id="lblVagas" text="50 / 100" style="-fx-text-fill: white;"/>
+        </HBox>
+    </VBox>
+
+    <VBox spacing="5" VBox.vgrow="ALWAYS">
+        <Label text="Sobre o evento" styleClass="h2" style="-fx-font-size: 14px;"/>
+        <Label fx:id="lblDescricao" text="Descrição detalhada do evento..." wrapText="true" style="-fx-text-fill: #d4d4d8;"/>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <Label fx:id="lblFeedback" text="" style="-fx-font-size: 12px;"/>
+        <Button fx:id="btnCancelar" text="Cancelar Inscrição" onAction="#cancelar" styleClass="btn-danger" visible="false" managed="false"/>
+        <Button fx:id="btnInscrever" text="Inscrever-se" onAction="#inscrever" styleClass="btn-primary"/>
+        <Button text="Fechar" onAction="#fechar" styleClass="nav-btn"/>
+    </HBox>
+
+</VBox>
