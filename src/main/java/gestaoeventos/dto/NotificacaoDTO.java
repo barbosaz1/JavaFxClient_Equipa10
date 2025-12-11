@@ -1,3 +1,4 @@
+
 package gestaoeventos.dto;
 
 import gestaoeventos.entity.TipoNotificacao;

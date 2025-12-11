@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox fx:id="rootPane" spacing="20" 
+      style="-fx-background-color: -color-bg-base; -fx-padding: 20;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gestaoeventos.client.controller.AdminController">
+    
+    <Label text="⚙️ Painel de Administração" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: -color-text-primary;"/>
+    
+    <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        
+        <!-- Tab Utilizadores -->
+        <Tab text="👥 Utilizadores" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="➕ Novo Utilizador" onAction="#novoUtilizador" styleClass="btn-primary"/>
+                    <Button text="🔄 Atualizar" onAction="#carregarUtilizadores" styleClass="btn-secondary"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="txtPesquisaUtilizador" promptText="Pesquisar..." prefWidth="200"/>
+                </HBox>
+                <TableView fx:id="tblUtilizadores" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNumero" text="Número" prefWidth="80"/>
+                        <TableColumn fx:id="colNome" text="Nome" prefWidth="200"/>
+                        <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
+                        <TableColumn fx:id="colPerfil" text="Perfil" prefWidth="120"/>
+                        <TableColumn fx:id="colAtivo" text="Ativo" prefWidth="60"/>
+                        <TableColumn fx:id="colAcoesUtilizador" text="Ações" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab Eventos -->
+        <Tab text="📅 Eventos" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="➕ Novo Evento" onAction="#novoEvento" styleClass="btn-primary"/>
+                    <Button text="🔄 Atualizar" onAction="#carregarEventos" styleClass="btn-secondary"/>
+                </HBox>
+                <TableView fx:id="tblEventos" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colEventoId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colEventoTitulo" text="Título" prefWidth="200"/>
+                        <TableColumn fx:id="colEventoData" text="Data Início" prefWidth="150"/>
+                        <TableColumn fx:id="colEventoEstado" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="colEventoLocal" text="Local" prefWidth="150"/>
+                        <TableColumn fx:id="colAcoesEvento" text="Ações" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab Locais -->
+        <Tab text="📍 Locais" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="➕ Novo Local" onAction="#novoLocal" styleClass="btn-primary"/>
+                    <Button text="🔄 Atualizar" onAction="#carregarLocais" styleClass="btn-secondary"/>
+                </HBox>
+                <TableView fx:id="tblLocais" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colLocalId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colLocalNome" text="Nome" prefWidth="200"/>
+                        <TableColumn fx:id="colLocalCapacidade" text="Capacidade" prefWidth="100"/>
+                        <TableColumn fx:id="colLocalMorada" text="Morada" prefWidth="250"/>
+                        <TableColumn fx:id="colAcoesLocal" text="Ações" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab Inscrições -->
+        <Tab text="🎫 Inscrições" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="🔄 Atualizar" onAction="#carregarInscricoes" styleClass="btn-secondary"/>
+                    <ComboBox fx:id="cmbFiltroEvento" promptText="Filtrar por evento..."/>
+                </HBox>
+                <TableView fx:id="tblInscricoes" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colInscId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colInscEvento" text="Evento" prefWidth="200"/>
+                        <TableColumn fx:id="colInscUtilizador" text="Utilizador" prefWidth="150"/>
+                        <TableColumn fx:id="colInscData" text="Data Inscrição" prefWidth="150"/>
+                        <TableColumn fx:id="colInscEstado" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="colInscCheckIn" text="Check-in" prefWidth="80"/>
+                        <TableColumn fx:id="colAcoesInscricao" text="Ações" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab Logs -->
+        <Tab text="📋 Logs de Auditoria" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="🔄 Atualizar" onAction="#carregarLogs" styleClass="btn-secondary"/>
+                    <DatePicker fx:id="dpDataInicio" promptText="Data início"/>
+                    <DatePicker fx:id="dpDataFim" promptText="Data fim"/>
+                    <Button text="🔍 Filtrar" onAction="#filtrarLogs" styleClass="btn-secondary"/>
+                </HBox>
+                <TableView fx:id="tblLogs" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colLogId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colLogAcao" text="Ação" prefWidth="150"/>
+                        <TableColumn fx:id="colLogEntidade" text="Entidade" prefWidth="100"/>
+                        <TableColumn fx:id="colLogEntidadeId" text="ID Ent." prefWidth="60"/>
+                        <TableColumn fx:id="colLogAutor" text="Autor" prefWidth="120"/>
+                        <TableColumn fx:id="colLogData" text="Data/Hora" prefWidth="150"/>
+                        <TableColumn fx:id="colLogMotivo" text="Motivo" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+    </TabPane>
+</VBox>

@@ -2,10 +2,15 @@ package gestaoeventos.service;
 
 import gestaoeventos.dto.NotificacaoDTO;
 import gestaoeventos.entity.Notificacao;
+import gestaoeventos.entity.TipoNotificacao;
+import gestaoeventos.entity.Utilizador;
 import gestaoeventos.exception.NotFoundException;
 import gestaoeventos.repository.NotificacaoRepository;
+import gestaoeventos.repository.UtilizadorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,9 +18,12 @@ import java.util.stream.Collectors;
 public class NotificacaoService {
 
     private final NotificacaoRepository notificacaoRepository;
+    private final UtilizadorRepository utilizadorRepository;
 
-    public NotificacaoService(NotificacaoRepository notificacaoRepository) {
+    public NotificacaoService(NotificacaoRepository notificacaoRepository,
+            UtilizadorRepository utilizadorRepository) {
         this.notificacaoRepository = notificacaoRepository;
+        this.utilizadorRepository = utilizadorRepository;
     }
 
     public List<NotificacaoDTO> listarPorDestinatario(Integer numero) {
@@ -31,6 +39,31 @@ public class NotificacaoService {
         n.setLida(true);
         Notificacao salvo = notificacaoRepository.save(n);
         return toDTO(salvo);
+    }
+
+    /**
+     * Envia um anúncio para todos os utilizadores ativos
+     */
+    @Transactional
+    public int enviarAnuncioBroadcast(String conteudo, Integer autorNumero) {
+        List<Utilizador> utilizadores = utilizadorRepository.findAll()
+                .stream()
+                .filter(Utilizador::isAtivo)
+                .collect(Collectors.toList());
+
+        int count = 0;
+        for (Utilizador dest : utilizadores) {
+            Notificacao notif = new Notificacao();
+            notif.setDestinatario(dest);
+            notif.setTipo(TipoNotificacao.ANUNCIO);
+            notif.setConteudo(conteudo);
+            notif.setCanal("SISTEMA");
+            notif.setLida(false);
+            notif.setDataCriacao(LocalDateTime.now());
+            notificacaoRepository.save(notif);
+            count++;
+        }
+        return count;
     }
 
     private NotificacaoDTO toDTO(Notificacao n) {

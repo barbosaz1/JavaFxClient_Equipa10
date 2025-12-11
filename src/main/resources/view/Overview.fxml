@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="24.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gestaoeventos.client.controller.OverviewController">
+
+    <VBox spacing="4.0">
+        <Label text="Overview" styleClass="h1"/>
+        <Label fx:id="lblWelcome" text="Bem-vindo ao Portal" styleClass="text-muted"/>
+    </VBox>
+
+    <HBox spacing="16.0">
+        <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="8.0">
+            <Label text="Próximos Eventos" styleClass="text-muted"/>
+            <Label fx:id="lblTotalEventos" text="..." style="-fx-font-size: 36px; -fx-font-weight: 700; -fx-text-fill: white;"/>
+            <Label text="Eventos futuros disponíveis" style="-fx-font-size: 12px; -fx-text-fill: #52525b;"/>
+        </VBox>
+        
+        <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="8.0">
+            <Label text="Inscrições Ativas" styleClass="text-muted"/>
+            <Label fx:id="lblInscricoes" text="..." style="-fx-font-size: 36px; -fx-font-weight: 700; -fx-text-fill: white;"/>
+            <Label text="Confirmadas na tua agenda" style="-fx-font-size: 12px; -fx-text-fill: #52525b;"/>
+        </VBox>
+    </HBox>
+
+    <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="12.0">
+        <Label text="📢  Avisos da UPT" styleClass="h2"/>
+        <Label text="• O check-in nos eventos é obrigatório para emissão de certificado." styleClass="text-muted"/>
+        <Label text="• Novos workshops de tecnologia adicionados para o próximo mês." styleClass="text-muted"/>
+        <Label text="• Em caso de dúvida, contacte o suporte académico." styleClass="text-muted"/>
+    </VBox>
+</VBox>

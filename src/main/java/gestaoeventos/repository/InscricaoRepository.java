@@ -16,4 +16,6 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Integer> {
     int countByEventoIdAndEstado(Integer eventoId, EstadoInscricao estado);
 
     Optional<Inscricao> findByQrCodeCheckin(String qrCodeCheckin);
+
+    List<Inscricao> findByEventoIdAndCheckInTrue(Integer eventoId);
 }

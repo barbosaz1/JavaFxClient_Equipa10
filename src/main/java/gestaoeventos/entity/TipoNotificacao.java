@@ -6,5 +6,6 @@ public enum TipoNotificacao {
     EVENTO_CRIADO,
     EVENTO_ALTERADO,
     EVENTO_CANCELADO,
-    LEMBRETE_EVENTO
+    LEMBRETE_EVENTO,
+    ANUNCIO
 }

@@ -1,0 +1,149 @@
+/* =============================================================================
+ 	DARK THEME
+   ============================================================================= */
+.root {
+    /* Cores Base */
+    -color-bg-base:     #09090b; 
+    -color-bg-surface:  #18181b; 
+    -color-bg-subtle:   #27272a; 
+    -color-bg-active:   #3f3f46; 
+    
+    /* Cores de Texto */
+    -color-text-primary: #fafafa; 
+    -color-text-muted:   #a1a1aa; 
+    
+    /* Cores de Ação */
+    -color-accent:       #6366f1; 
+    -color-accent-hover: #4f46e5; 
+    -color-danger:       #ef4444; 
+
+    /* Variáveis Globais */
+    -fx-background-color: -color-bg-base;
+    -fx-font-family: "Segoe UI", sans-serif; /* Fonte do sistema */
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-text-primary;
+}
+
+/* =============================================================================
+   SIDEBAR
+   ============================================================================= */
+.sidebar {
+    -fx-background-color: -color-bg-surface;
+    -fx-border-color: -color-bg-subtle;
+    -fx-border-width: 0 1 0 0; /* Apenas borda direita */
+    -fx-padding: 24 16; 
+    -fx-spacing: 8;
+}
+
+.app-logo {
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -color-text-primary;
+    -fx-padding: 0 0 24 12; /* Espaço abaixo do logo */
+}
+
+/* Botões do Menu */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-muted;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 10 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 12; /* Espaço entre ícone e texto */
+}
+
+.nav-btn:hover {
+    -fx-background-color: -color-bg-subtle;
+    -fx-text-fill: -color-text-primary;
+}
+
+.nav-btn:selected, 
+.nav-btn.active {
+    -fx-background-color: -color-bg-subtle;
+    -fx-text-fill: -color-text-primary;
+    -fx-border-color: -color-bg-active;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+}
+
+.menu-separator {
+    -fx-background-color: -color-bg-subtle;
+    -fx-pref-height: 1;
+    -fx-max-height: 1;
+    -fx-margin: 8 0;
+}
+
+/* =============================================================================
+   TOPBAR
+   ============================================================================= */
+.topbar {
+    -fx-background-color: -color-bg-base;
+    -fx-padding: 12 24;
+    -fx-border-color: -color-bg-subtle;
+    -fx-border-width: 0 0 1 0; /* Apenas borda inferior */
+    -fx-alignment: CENTER_LEFT;
+}
+
+.breadcrumb {
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 13px;
+}
+
+/* Botões de Janela */
+.window-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-muted;
+    -fx-background-radius: 4;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+.window-btn:hover { -fx-background-color: -color-bg-subtle; -fx-text-fill: -color-text-primary; }
+.window-close:hover { -fx-background-color: -color-danger; -fx-text-fill: white; }
+
+/* =============================================================================
+   CONTENT AREA E CARDS
+   ============================================================================= */
+.content-area {
+    -fx-padding: 32; /* Margem para o conteúdo */
+    -fx-background-color: -color-bg-base;
+}
+
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -color-text-primary;
+    -fx-padding: 0 0 16 0;
+}
+
+/* Cards */
+.card {
+    -fx-background-color: -color-bg-surface;
+    -fx-background-radius: 8;
+    -fx-border-color: -color-bg-subtle;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4); /* Sombra suave */
+    -fx-padding: 24;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-primary;
+    -fx-padding: 0 0 16 0;
+}
+
+/* =============================================================================
+   USER PROFILE (BOTTOM SIDEBAR)
+   ============================================================================= */
+.user-profile {
+    -fx-padding: 16 12;
+    -fx-background-color: -color-bg-subtle; /* mais claro */
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.user-name { -fx-font-size: 13px; -fx-font-weight: 600; }
+.user-role { -fx-font-size: 11px; -fx-text-fill: -color-text-muted; }

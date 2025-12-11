@@ -1,0 +1,534 @@
+
+/* ============================================================================= 
+   VARIÁVEIS GLOBAIS 
+   ============================================================================= */
+.root {
+    /* --- Paleta Principal --- */
+    -color-bg-base:       #09090b;  /* Fundo base - quase preto */
+    -color-bg-sidebar:    #0c0c0e;  /* Sidebar */
+    -color-bg-card:       #18181b;  /* Cards e modais */
+    -color-bg-surface:    #27272a;  /* Inputs, tabelas */
+    -color-bg-hover:      #3f3f46;  /* Hover states */
+    
+    /* --- Bordas --- */
+    -color-border-subtle: #27272a;
+    -color-border-focus:  #6b4df7;
+    
+    /* --- Texto --- */
+    -color-text-primary:  #fafafa;
+    -color-text-secondary:#a1a1aa;
+    -color-text-muted:    #71717a;
+    
+    /* --- Cores de Destaque (Gradiente Roxo Premium) --- */
+    -color-accent-1:      #6b4df7;  /* Roxo principal */
+    -color-accent-2:      #8b5cf6;  /* Roxo claro */
+    -color-accent-3:      #a78bfa;  /* Roxo mais claro */
+    -color-accent-glow:   rgba(107, 77, 247, 0.35);
+    
+    /* --- Estados --- */
+    -color-success:       #22c55e;
+    -color-success-bg:    rgba(34, 197, 94, 0.1);
+    -color-danger:        #ef4444;
+    -color-danger-bg:     rgba(239, 68, 68, 0.1);
+    -color-warning:       #f59e0b;
+    -color-warning-bg:    rgba(245, 158, 11, 0.1);
+    -color-info:          #3b82f6;
+    -color-info-bg:       rgba(59, 130, 246, 0.1);
+
+    /* --- Config Base --- */
+    -fx-background-color: -color-bg-base;
+    -fx-font-family: "Segoe UI", "Inter", -apple-system, system-ui, sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-text-primary;
+}
+
+/* =============================================================================
+   BOTÕES
+   ============================================================================= */
+
+/* Botão Primário*/
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom right, -color-accent-1, -color-accent-2);
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, -color-accent-glow, 12, 0.3, 0, 2);
+}
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom right, derive(-color-accent-1, 15%), derive(-color-accent-2, 15%));
+    -fx-effect: dropshadow(gaussian, -color-accent-glow, 20, 0.5, 0, 3);
+}
+.btn-primary:pressed {
+    -fx-background-color: linear-gradient(to bottom right, derive(-color-accent-1, -10%), derive(-color-accent-2, -10%));
+    -fx-effect: dropshadow(gaussian, -color-accent-glow, 8, 0.2, 0, 1);
+}
+
+/* Botão Secundário*/
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: -color-text-secondary;
+    -fx-font-weight: 500;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: -color-bg-surface;
+    -fx-border-color: -color-text-muted;
+    -fx-text-fill: -color-text-primary;
+}
+
+/* Botão de Perigo */
+.btn-danger {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-danger;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: -color-danger;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+.btn-danger:hover {
+    -fx-background-color: -color-danger-bg;
+}
+
+/* Botão Ícone*/
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: -color-text-muted;
+    -fx-padding: 6 10;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+}
+.btn-icon:hover {
+    -fx-background-color: -color-bg-hover;
+    -fx-text-fill: -color-text-primary;
+}
+
+/* Botão Small */
+.btn-small {
+    -fx-background-color: -color-bg-surface;
+    -fx-text-fill: -color-text-secondary;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.btn-small:hover {
+    -fx-background-color: -color-bg-hover;
+    -fx-text-fill: -color-text-primary;
+}
+
+/* =============================================================================
+   NAVEGAÇÃO - Sidebar
+   ============================================================================= */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-muted;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 16;
+    -fx-font-weight: 500;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 0 3;
+}
+.nav-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-text-fill: -color-text-secondary;
+}
+.nav-btn.active {
+    -fx-background-color: rgba(107, 77, 247, 0.12);
+    -fx-text-fill: -color-accent-2;
+    -fx-border-color: -color-accent-1;
+    -fx-font-weight: 600;
+}
+
+/* =============================================================================
+   CARDS E CONTAINERS
+   ============================================================================= */
+.card {
+    -fx-background-color: -color-bg-card;
+    -fx-background-radius: 12;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0, 0, 2);
+    -fx-padding: 20;
+}
+
+.card-hover:hover {
+    -fx-border-color: -color-accent-1;
+    -fx-effect: dropshadow(gaussian, -color-accent-glow, 12, 0.2, 0, 2);
+}
+
+/* =============================================================================
+   INPUTS E FORMS
+   ============================================================================= */
+.text-field, .password-field, .text-area {
+    -fx-background-color: -color-bg-surface;
+    -fx-text-fill: -color-text-primary;
+    -fx-prompt-text-fill: -color-text-muted;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+}
+.text-field:focused, .password-field:focused, .text-area:focused {
+    -fx-border-color: -color-accent-1;
+    -fx-effect: dropshadow(gaussian, -color-accent-glow, 8, 0.2, 0, 0);
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: -color-bg-surface;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-primary;
+    -fx-padding: 8 12;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: -color-bg-card;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 8;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: -color-bg-hover;
+}
+
+/* Spinner */
+.spinner {
+    -fx-background-color: -color-bg-surface;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 6;
+}
+.spinner .text-field {
+    -fx-border-width: 0;
+}
+
+/* DatePicker */
+.date-picker {
+    -fx-background-color: -color-bg-surface;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 8;
+}
+.date-picker .text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+/* =============================================================================
+   TABELAS
+   ============================================================================= */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+.table-view .column-header-background {
+    -fx-background-color: -color-bg-base;
+    -fx-background-radius: 10 10 0 0;
+}
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -color-border-subtle transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.table-view .column-header .label {
+    -fx-text-fill: -color-text-muted;
+    -fx-font-weight: 600;
+    -fx-font-size: 12px;
+    -fx-padding: 12 16;
+}
+.table-row-cell {
+    -fx-background-color: -color-bg-card;
+    -fx-border-color: transparent transparent -color-border-subtle transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.table-row-cell:odd {
+    -fx-background-color: derive(-color-bg-card, 3%);
+}
+.table-row-cell:hover {
+    -fx-background-color: -color-bg-surface;
+}
+.table-row-cell:selected {
+    -fx-background-color: rgba(107, 77, 247, 0.15);
+    -fx-border-color: transparent transparent -color-accent-1 transparent;
+}
+.table-cell {
+    -fx-text-fill: -color-text-primary;
+    -fx-padding: 12 16;
+    -fx-font-size: 13px;
+}
+
+/* Placeholder */
+.table-view .placeholder .label {
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 13px;
+}
+
+/* =============================================================================
+   TABS
+   ============================================================================= */
+.tab-pane {
+    -fx-background-color: transparent;
+}
+.tab-pane .tab-header-area {
+    -fx-padding: 0 0 10 0;
+}
+.tab-pane .tab-header-background {
+    -fx-background-color: transparent;
+}
+.tab {
+    -fx-background-color: transparent;
+    -fx-padding: 10 20;
+}
+.tab .tab-label {
+    -fx-text-fill: -color-text-muted;
+    -fx-font-weight: 500;
+}
+.tab:hover .tab-label {
+    -fx-text-fill: -color-text-secondary;
+}
+.tab:selected {
+    -fx-background-color: -color-bg-card;
+    -fx-background-radius: 8 8 0 0;
+}
+.tab:selected .tab-label {
+    -fx-text-fill: -color-text-primary;
+    -fx-font-weight: 600;
+}
+
+/* =============================================================================
+   TEXTOS
+   ============================================================================= */
+.h1 {
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -color-text-primary;
+}
+.h2 {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-primary;
+}
+.h3 {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-primary;
+}
+.text-muted {
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 13px;
+}
+.text-small {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-secondary;
+}
+
+/* =============================================================================
+   BADGES
+   ============================================================================= */
+.badge {
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+.badge-success {
+    -fx-background-color: -color-success-bg;
+    -fx-text-fill: -color-success;
+}
+.badge-danger {
+    -fx-background-color: -color-danger-bg;
+    -fx-text-fill: -color-danger;
+}
+.badge-warning {
+    -fx-background-color: -color-warning-bg;
+    -fx-text-fill: -color-warning;
+}
+.badge-info {
+    -fx-background-color: -color-info-bg;
+    -fx-text-fill: -color-info;
+}
+.badge-default {
+    -fx-background-color: -color-bg-surface;
+    -fx-text-fill: -color-text-muted;
+}
+
+/* Estados específicos */
+.badge-publicado {
+    -fx-background-color: -color-success-bg;
+    -fx-text-fill: -color-success;
+}
+.badge-cancelado {
+    -fx-background-color: -color-danger-bg;
+    -fx-text-fill: -color-danger;
+}
+.badge-rascunho {
+    -fx-background-color: -color-bg-surface;
+    -fx-text-fill: -color-text-muted;
+}
+
+/* =============================================================================
+   BARRA DE TÍTULO
+   ============================================================================= */
+.window-bar {
+    -fx-background-color: -color-bg-base;
+    -fx-padding: 8 16;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-width: 0 0 1 0;
+    -fx-alignment: CENTER_LEFT;
+}
+.window-title {
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 12px;
+}
+.window-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-muted;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+    -fx-background-radius: 4;
+}
+.window-btn:hover {
+    -fx-background-color: -color-bg-surface;
+    -fx-text-fill: -color-text-primary;
+}
+.window-close:hover {
+    -fx-background-color: -color-danger;
+    -fx-text-fill: white;
+}
+
+/* =============================================================================
+   CALENDÁRIO
+   ============================================================================= */
+.calendar-grid {
+    -fx-background-color: -color-bg-card;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 12;
+}
+.calendar-cell {
+    -fx-border-color: -color-border-subtle;
+    -fx-border-width: 0.5;
+    -fx-background-color: transparent;
+}
+.calendar-cell:hover {
+    -fx-background-color: -color-bg-surface;
+}
+.calendar-cell.selected {
+    -fx-background-color: rgba(107, 77, 247, 0.15);
+    -fx-border-color: -color-accent-2;
+}
+
+/* Event Dots */
+.event-dot {
+    -fx-min-width: 6px;
+    -fx-min-height: 6px;
+    -fx-background-radius: 50%;
+}
+.dot-has-event {
+    -fx-fill: -color-text-muted;
+}
+.dot-my-event {
+    -fx-fill: linear-gradient(to bottom right, -color-accent-2, -color-accent-1);
+    -fx-effect: dropshadow(gaussian, -color-accent-1, 6, 0.6, 0, 0);
+}
+
+/* =============================================================================
+   SCROLLBARS
+   ============================================================================= */
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+.scroll-bar .thumb {
+    -fx-background-color: -color-bg-hover;
+    -fx-background-radius: 10;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: -color-text-muted;
+}
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-shape: "";
+}
+
+/* =============================================================================
+   SEPARADORES
+   ============================================================================= */
+.separator {
+    -fx-background-color: -color-border-subtle;
+}
+.separator .line {
+    -fx-border-color: -color-border-subtle;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* =============================================================================
+   TOOLTIPS
+   ============================================================================= */
+.tooltip {
+    -fx-background-color: -color-bg-card;
+    -fx-text-fill: -color-text-primary;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);
+}
+
+/* =============================================================================
+   DIALOGS
+   ============================================================================= */
+.dialog-pane {
+    -fx-background-color: -color-bg-card;
+    -fx-border-color: -color-border-subtle;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+.dialog-pane .header-panel {
+    -fx-background-color: transparent;
+}
+.dialog-pane .header-panel .label {
+    -fx-text-fill: -color-text-primary;
+    -fx-font-weight: 600;
+}
+.dialog-pane .content {
+    -fx-padding: 20;
+}
+
+/* =============================================================================
+   ANIMAÇÕES
+   ============================================================================= */
+.glow-effect {
+    -fx-effect: dropshadow(gaussian, -color-accent-glow, 20, 0.4, 0, 0);
+}
+.subtle-shadow {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
+}

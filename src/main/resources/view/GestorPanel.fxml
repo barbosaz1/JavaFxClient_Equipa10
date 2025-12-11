@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-background-color: transparent;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gestaoeventos.client.controller.GestorController">
+    
+    <Label text="📋 Painel do Gestor de Eventos" styleClass="h1"/>
+    
+    <TabPane VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        
+        <!-- Tab Meus Eventos -->
+        <Tab text="📅 Meus Eventos" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="➕ Criar Evento" onAction="#criarEvento" styleClass="btn-primary"/>
+                    <Button text="🔄 Atualizar" onAction="#carregarEventos" styleClass="btn-secondary"/>
+                </HBox>
+                <TableView fx:id="tblEventos" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colEventoTitulo" text="Título" prefWidth="200"/>
+                        <TableColumn fx:id="colEventoData" text="Data" prefWidth="150"/>
+                        <TableColumn fx:id="colEventoEstado" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="colEventoAcoes" text="Ações" prefWidth="120"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Ainda não criou nenhum evento. Clique em 'Criar Evento' para começar."/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab Locais -->
+        <Tab text="📍 Gestão de Locais" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="➕ Novo Local" onAction="#novoLocal" styleClass="btn-secondary"/>
+                    <Button text="🔄 Atualizar" onAction="#carregarLocais" styleClass="btn-secondary"/>
+                </HBox>
+                <Label text="ℹ️ Para criar novos locais, utilize o painel de Administração." 
+                       style="-fx-text-fill: #9CA3AF; -fx-font-style: italic;"/>
+                <TableView fx:id="tblLocais" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colLocalNome" text="Nome" prefWidth="200"/>
+                        <TableColumn fx:id="colLocalCapacidade" text="Capacidade" prefWidth="100"/>
+                        <TableColumn fx:id="colLocalMorada" text="Morada" prefWidth="300"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab Estatísticas -->
+        <Tab text="📊 Estatísticas" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <Label text="Selecione um evento para ver estatísticas:" style="-fx-font-weight: bold;"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <ComboBox fx:id="cmbEventos" promptText="Selecionar evento..." prefWidth="300"/>
+                    <Button text="📈 Ver Estatísticas" onAction="#verEstatisticas" styleClass="btn-primary"/>
+                </HBox>
+                
+                <Separator/>
+                
+                <GridPane fx:id="gridEstatisticas" hgap="20" vgap="12" visible="false" styleClass="card">
+                    <Label text="📊 Estatísticas do Evento" GridPane.rowIndex="0" GridPane.columnIndex="0" 
+                           GridPane.columnSpan="2" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                    
+                    <Label text="Total Inscrições:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblTotalInscricoes" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-text-fill: #9E7BFF;"/>
+                    
+                    <Label text="Inscrições Ativas:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblInscricoesAtivas" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: #22c55e;"/>
+                    
+                    <Label text="Check-ins Realizados:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblCheckIns" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #3b82f6;"/>
+                    
+                    <Label text="Vagas Disponíveis:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblVagas" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-text-fill: #f59e0b;"/>
+                    
+                    <Label text="Taxa de Ocupação:" GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblOcupacao" GridPane.rowIndex="5" GridPane.columnIndex="1" style="-fx-text-fill: #ef4444;"/>
+                </GridPane>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab Anúncios -->
+        <Tab text="📢 Anúncios" closable="false">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <Label text="Enviar anúncio para todos os utilizadores:" style="-fx-font-weight: bold;"/>
+                <TextArea fx:id="txtAnuncio" promptText="Escreva aqui o conteúdo do anúncio..." prefRowCount="5"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="📤 Enviar Anúncio" onAction="#enviarAnuncio" styleClass="btn-primary"/>
+                </HBox>
+                <Label fx:id="lblResultadoAnuncio" style="-fx-text-fill: #22c55e;"/>
+            </VBox>
+        </Tab>
+        
+    </TabPane>
+</VBox>

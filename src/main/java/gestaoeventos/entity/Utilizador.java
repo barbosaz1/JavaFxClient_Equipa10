@@ -16,61 +16,48 @@ import java.util.Set;
         )
 )
 
-
 public class Utilizador {
-    // Identificador do utilizador.
     @Id
     @Column(name = "numero", nullable = false)
     private Integer numero;
 
-    // Hash da password.
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    // Nome do utilizador.
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    // Email único do utilizador; existe uma constraint para evitar duplicados.
     @Column(name = "email", nullable = false, length = 150)
     private String email;
 
-    // Perfil/role do utilizador (ex.: ADMIN, USER). Usamos Enum armazenado como String.
     @Enumerated(EnumType.STRING)
     @Column(name = "perfil", nullable = false, length = 20)
     private PerfilUtilizador perfil;
 
-    // Data e hora do registo; por defeito inicializa com o momento actual.
     @Column(name = "data_registo", nullable = false)
     private LocalDateTime dataRegisto = LocalDateTime.now();
 
-    // Indica se a conta está ativa; usado para ativar/desativar utilizadores.
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
     
-    // Relações com outras entidades
-
-    // Eventos criados por este utilizador (one-to-many).
+    //relacoes
+    
     @JsonIgnore
     @OneToMany(mappedBy = "criador")
     private Set<Evento> eventosCriados = new HashSet<>();
 
-    // Inscrições deste utilizador em eventos.
     @JsonIgnore
     @OneToMany(mappedBy = "utilizador")
     private Set<Inscricao> inscricoes = new HashSet<>();
 
-    // Entradas na lista de espera deste utilizador.
     @JsonIgnore
     @OneToMany(mappedBy = "utilizador")
     private Set<ListaEspera> entradasListaEspera = new HashSet<>();
 
-    // Notificações recebidas;
     @JsonIgnore
     @OneToMany(mappedBy = "destinatario", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Notificacao> notificacoes = new HashSet<>();
 
-    // Logs de auditoria criados por este utilizador.
     @JsonIgnore
     @OneToMany(mappedBy = "autor")
     private Set<LogAuditoria> logsCriados = new HashSet<>();

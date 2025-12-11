@@ -9,3 +9,4 @@ public interface NotificacaoRepository extends JpaRepository<Notificacao, Intege
 
     List<Notificacao> findByDestinatarioNumeroOrderByDataCriacaoDesc(Integer destinatarioNumero);
 }
+

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" 
+      stylesheets="@../css/app-theme.css" 
+      style="-fx-background-color: -color-bg-base;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gestaoeventos.client.controller.LoginController">
+
+    <fx:include source="components/TitleBar.fxml" />
+
+    <VBox alignment="CENTER" VBox.vgrow="ALWAYS" spacing="30.0">
+        
+        <VBox alignment="CENTER" spacing="5">
+            <Label text="Gestão Eventos UPT" textFill="WHITE">
+                <font><Font name="Segoe UI Bold" size="32.0" /></font>
+            </Label>
+            <Label text="Bem-vindo ao Portal Académico" styleClass="text-muted"/>
+        </VBox>
+
+        <VBox maxWidth="380.0" spacing="20.0" styleClass="card">
+            <padding><Insets bottom="40.0" left="40.0" right="40.0" top="40.0" /></padding>
+            
+            <VBox spacing="8.0">
+                <Label text="Número de Utilizador" styleClass="text-muted"/>
+                <TextField fx:id="txtNumero" promptText="Ex: 12345" />
+            </VBox>
+
+            <VBox spacing="8.0">
+                <Label text="Palavra-passe" styleClass="text-muted"/>
+                <PasswordField fx:id="txtPassword" />
+            </VBox>
+
+            <Label fx:id="lblFeedback" textFill="#ef4444" wrapText="true" minHeight="20"/>
+
+            <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#handleLogin" 
+                    text="Entrar no Portal" styleClass="btn-primary">
+                <font><Font name="System Bold" size="14.0" /></font>
+            </Button>
+        </VBox>
+        
+    </VBox>
+</VBox>
