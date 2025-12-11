@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 	
@@ -62,7 +62,35 @@
     		<groupId>org.springframework.security</groupId>
     		<artifactId>spring-security-crypto</artifactId>
 		</dependency>
-
+		
+		<dependency>
+        	<groupId>org.openjfx</groupId>
+        	<artifactId>javafx-controls</artifactId>
+        	<version>21</version>
+    	</dependency>
+    	
+    	<dependency>
+    		<groupId>org.openjfx</groupId>
+    		<artifactId>javafx-graphics</artifactId>
+    		<version>21</version>
+		</dependency>
+		
+    	<dependency>
+        	<groupId>org.openjfx</groupId>
+        	<artifactId>javafx-fxml</artifactId>
+        	<version>21</version>
+    	</dependency>
+    
+    	<dependency>
+        	<groupId>com.fasterxml.jackson.core</groupId>
+        	<artifactId>jackson-databind</artifactId>
+        	<version>2.15.2</version>
+    	</dependency>
+    	<dependency>
+        	<groupId>com.fasterxml.jackson.datatype</groupId>
+        	<artifactId>jackson-datatype-jsr310</artifactId>
+        	<version>2.15.2</version> 
+        </dependency>
 	</dependencies>
 
 	<build>
