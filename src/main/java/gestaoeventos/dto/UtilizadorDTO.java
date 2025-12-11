@@ -2,29 +2,17 @@ package gestaoeventos.dto;
 
 import gestaoeventos.entity.PerfilUtilizador;
 
-/**
- * DTO público para representar um utilizador na API.
- * Apenas os campos que podem ser expostos externamente.
- */
-
 public class UtilizadorDTO {
 
-    // Número identificador do utilizador
     private Integer numero;
-
-    // Nome do utilizador.
     private String nome;
-
-    // Email do utilizador (único)
     private String email;
-
-    // Perfil/role do utilizador (enum)
     private PerfilUtilizador perfil;
+    private Boolean ativo;
 
-    // Indica se a conta está activa ou não.
-    private boolean ativo;
+    public UtilizadorDTO() {
+    }
 
-    // Construtor
     public UtilizadorDTO(Integer numero, String nome, String email,
                          PerfilUtilizador perfil, boolean ativo) {
         this.numero = numero;
@@ -33,8 +21,6 @@ public class UtilizadorDTO {
         this.perfil = perfil;
         this.ativo = ativo;
     }
-
-    // GETTERS E SETTERS
 
     public Integer getNumero() {
         return numero;
