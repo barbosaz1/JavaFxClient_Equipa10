@@ -28,100 +28,106 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Service
 public class EventoService {
-	
-	private final EventoRepository eventoRepository;
+
+    private final EventoRepository eventoRepository;
     private final UtilizadorRepository utilizadorRepository;
     private final LocalRepository localRepository;
     private final InscricaoRepository inscricaoRepository;
     private final ListaEsperaRepository listaEsperaRepository;
     private final LogAuditoriaRepository logAuditoriaRepository;
-    
-    public EventoService(EventoRepository eventoRepository,UtilizadorRepository utilizadorRepository,LocalRepository localRepository,InscricaoRepository inscricaoRepository,ListaEsperaRepository listaEsperaRepository,LogAuditoriaRepository logAuditoriaRepository) {
-    	this.eventoRepository = eventoRepository;
-    	this.utilizadorRepository = utilizadorRepository;
-    	this.localRepository = localRepository;
-    	this.inscricaoRepository = inscricaoRepository;
-    	this.listaEsperaRepository = listaEsperaRepository;
-    	this.logAuditoriaRepository = logAuditoriaRepository;
+
+    public EventoService(EventoRepository eventoRepository,
+            UtilizadorRepository utilizadorRepository,
+            LocalRepository localRepository,
+            InscricaoRepository inscricaoRepository,
+            ListaEsperaRepository listaEsperaRepository,
+            LogAuditoriaRepository logAuditoriaRepository) {
+        this.eventoRepository = eventoRepository;
+        this.utilizadorRepository = utilizadorRepository;
+        this.localRepository = localRepository;
+        this.inscricaoRepository = inscricaoRepository;
+        this.listaEsperaRepository = listaEsperaRepository;
+        this.logAuditoriaRepository = logAuditoriaRepository;
     }
 
     public List<EventoDTO> listarTodos() {
-    	return eventoRepository.findAll()
-    			.stream()
-    			.map(this::toDTO)
-    			.collect(Collectors.toList());
+        return eventoRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     public EventoDTO obterPorId(Integer id) {
-    	Evento e = eventoRepository.findById(id)
-    			.orElseThrow(() -> new NotFoundException("Evento não encontrado"));
-    	return toDTO(e);
+        Evento e = eventoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Evento não encontrado"));
+        return toDTO(e);
     }
 
     public EventoDTO criar(EventoCreateDTO dto) {
-    	if (dto.getTitulo() == null || dto.getTitulo().isBlank()) {
-    		throw new BusinessException("Título é obrigatório");
-    	}
-    	if (dto.getDataInicio() == null || dto.getDataFim() == null) {
-    		throw new BusinessException("Datas de início e fim são obrigatórias");
-    	}
-    	if (dto.getDataFim().isBefore(dto.getDataInicio())) {
-    		throw new BusinessException("Data de fim não pode ser anterior à data de início");
-    	}
+        if (dto.getTitulo() == null || dto.getTitulo().isBlank()) {
+            throw new BusinessException("Título é obrigatório");
+        }
+        if (dto.getDataInicio() == null || dto.getDataFim() == null) {
+            throw new BusinessException("Datas de início e fim são obrigatórias");
+        }
+        if (dto.getDataFim().isBefore(dto.getDataInicio())) {
+            throw new BusinessException("Data de fim não pode ser anterior à data de início");
+        }
 
-    	Utilizador criador = utilizadorRepository.findById(dto.getCriadorNumero())
-    			.orElseThrow(() -> new BusinessException("Criador não encontrado"));
+        Utilizador criador = utilizadorRepository.findById(dto.getCriadorNumero())
+                .orElseThrow(() -> new BusinessException("Criador não encontrado"));
 
-    	Local local = localRepository.findById(dto.getLocalId())
-    			.orElseThrow(() -> new BusinessException("Local não encontrado"));
+        Local local = localRepository.findById(dto.getLocalId())
+                .orElseThrow(() -> new BusinessException("Local não encontrado"));
 
-    	Evento e = new Evento();
-    	e.setTitulo(dto.getTitulo());
-    	e.setDescricao(dto.getDescricao());
-    	e.setDataInicio(dto.getDataInicio());
-    	e.setDataFim(dto.getDataFim());
-    	e.setMaxParticipantes(dto.getMaxParticipantes());
-    	e.setTipo(dto.getTipo());
-    	e.setAreaTematica(dto.getAreaTematica());
-    	e.setCriador(criador);
-    	e.setLocal(local);
-    	e.setEstado(EstadoEvento.RASCUNHO);
+        Evento e = new Evento();
+        e.setTitulo(dto.getTitulo());
+        e.setDescricao(dto.getDescricao());
+        e.setDataInicio(dto.getDataInicio());
+        e.setDataFim(dto.getDataFim());
+        e.setMaxParticipantes(dto.getMaxParticipantes());
+        e.setTipo(dto.getTipo());
+        e.setAreaTematica(dto.getAreaTematica());
+        e.setCriador(criador);
+        e.setLocal(local);
+        e.setEstado(EstadoEvento.RASCUNHO);
 
-    	Evento salvo = eventoRepository.save(e);
-    	registarLog("CRIAR_EVENTO", "Evento", salvo.getId(), criador, null);
-    	return toDTO(salvo);
+        Evento salvo = eventoRepository.save(e);
+        registarLog("CRIAR_EVENTO", "Evento", salvo.getId(), criador, null);
+        return toDTO(salvo);
     }
 
     public EventoDTO publicar(Integer id, Integer autorNumero) {
-    	Evento e = eventoRepository.findById(id)
-    			.orElseThrow(() -> new NotFoundException("Evento não encontrado"));
+        Evento e = eventoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Evento não encontrado"));
 
-    	Utilizador autor = utilizadorRepository.findById(autorNumero)
-    			.orElseThrow(() -> new BusinessException("Autor não encontrado"));
+        Utilizador autor = utilizadorRepository.findById(autorNumero)
+                .orElseThrow(() -> new BusinessException("Autor não encontrado"));
 
-    	e.setEstado(EstadoEvento.PUBLICADO);
-    	Evento salvo = eventoRepository.save(e);
+        e.setEstado(EstadoEvento.PUBLICADO);
+        Evento salvo = eventoRepository.save(e);
 
-    	registarLog("PUBLICAR_EVENTO", "Evento", id, autor, null);
-    	return toDTO(salvo);
+        registarLog("PUBLICAR_EVENTO", "Evento", id, autor, null);
+        return toDTO(salvo);
     }
 
     public EventoDTO cancelar(Integer id, Integer autorNumero, String motivo) {
-    	Evento e = eventoRepository.findById(id)
-    			.orElseThrow(() -> new NotFoundException("Evento não encontrado"));
+        Evento e = eventoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Evento não encontrado"));
 
-    	Utilizador autor = utilizadorRepository.findById(autorNumero)
-    			.orElseThrow(() -> new BusinessException("Autor não encontrado"));
+        Utilizador autor = utilizadorRepository.findById(autorNumero)
+                .orElseThrow(() -> new BusinessException("Autor não encontrado"));
 
-    	e.setEstado(EstadoEvento.CANCELADO);
-    	e.setMotivoRemocao(motivo);
-    	Evento salvo = eventoRepository.save(e);
+        e.setEstado(EstadoEvento.CANCELADO);
+        e.setMotivoRemocao(motivo);
+        Evento salvo = eventoRepository.save(e);
 
-    	registarLog("CANCELAR_EVENTO", "Evento", id, autor, motivo);
-    	return toDTO(salvo);
+        registarLog("CANCELAR_EVENTO", "Evento", id, autor, motivo);
+        return toDTO(salvo);
     }
-    
+
     /**
      * Inscrição com:
      * - validação de estado PUBLICADO
@@ -172,6 +178,7 @@ public class EventoService {
             return "EVENTO_LOTADO_LISTA_ESPERA";
         }
 
+        // ---------- INSCRIÇÃO NORMAL + QR CODE ----------
         Inscricao insc = new Inscricao();
         insc.setEvento(evento);
         insc.setUtilizador(utilizador);
@@ -196,7 +203,7 @@ public class EventoService {
         registarLog("INSCRICAO_EVENTO", "Evento", eventoId, utilizador, null);
         return "INSCRICAO_OK";
     }
-    
+
     /**
      * Promove o primeiro da lista de espera a inscrição ativa.
      */
@@ -232,14 +239,54 @@ public class EventoService {
         registarLog("PROMOVER_LISTA_ESPERA", "Evento", eventoId, proximo.getUtilizador(), null);
     }
 
+    /**
+     * Obtém estatísticas detalhadas de um evento
+     */
+    public gestaoeventos.dto.EstatisticasEventoDTO obterEstatisticas(Integer eventoId) {
+        Evento evento = eventoRepository.findById(eventoId)
+                .orElseThrow(() -> new NotFoundException("Evento não encontrado"));
+
+        List<Inscricao> inscricoes = inscricaoRepository.findByEventoId(eventoId);
+
+        int totalInscricoes = inscricoes.size();
+        int inscricoesAtivas = (int) inscricoes.stream()
+                .filter(i -> i.getEstado() == EstadoInscricao.ATIVA).count();
+        int inscricoesCanceladas = (int) inscricoes.stream()
+                .filter(i -> i.getEstado() == EstadoInscricao.CANCELADA).count();
+        int checkInsRealizados = (int) inscricoes.stream()
+                .filter(Inscricao::isCheckIn).count();
+
+        Integer maxParticipantes = evento.getMaxParticipantes();
+        int vagasDisponiveis = maxParticipantes != null ? Math.max(0, maxParticipantes - inscricoesAtivas) : -1;
+        double percentualOcupacao = maxParticipantes != null && maxParticipantes > 0
+                ? (inscricoesAtivas * 100.0 / maxParticipantes)
+                : 0.0;
+
+        gestaoeventos.dto.EstatisticasEventoDTO dto = new gestaoeventos.dto.EstatisticasEventoDTO();
+        dto.setEventoId(evento.getId());
+        dto.setEventoTitulo(evento.getTitulo());
+        dto.setTotalInscricoes(totalInscricoes);
+        dto.setInscricoesAtivas(inscricoesAtivas);
+        dto.setInscricoesCanceladas(inscricoesCanceladas);
+        dto.setCheckInsRealizados(checkInsRealizados);
+        dto.setMaxParticipantes(maxParticipantes);
+        dto.setVagasDisponiveis(vagasDisponiveis);
+        dto.setPercentualOcupacao(percentualOcupacao);
+        dto.setCertificadosEmitidos(0); // Será preenchido quando tiver acesso ao CertificadoRepository
+
+        return dto;
+    }
+
     private void registarLog(String acao, String entidade, Integer entidadeId,
-                             Utilizador autor, String motivo) {
+            Utilizador autor, String motivo) {
         LogAuditoria log = new LogAuditoria();
         log.setAcao(acao);
         log.setEntidade(entidade);
         log.setEntidadeId(entidadeId);
         log.setAutor(autor);
         log.setMotivo(motivo);
+        // dataHora e ipOrigem podem ser preenchidos automaticamente na entity, se
+        // quiseres
         logAuditoriaRepository.save(log);
     }
 
@@ -259,7 +306,7 @@ public class EventoService {
         dto.setMotivoRemocao(e.getMotivoRemocao());
         return dto;
     }
-    
+
     /**
      * Pesquisa de eventos com filtros opcionais:
      * - intervalo de datas (dataInicio)
@@ -268,10 +315,10 @@ public class EventoService {
      * - organizadorNumero (criador)
      */
     public List<EventoDTO> pesquisar(String inicioStr,
-                                     String fimStr,
-                                     String tipoStr,
-                                     Integer localId,
-                                     Integer organizadorNumero) {
+            String fimStr,
+            String tipoStr,
+            Integer localId,
+            Integer organizadorNumero) {
 
         List<Evento> todos = eventoRepository.findAll();
         Stream<Evento> stream = todos.stream();
@@ -288,8 +335,7 @@ public class EventoService {
             }
         } catch (DateTimeParseException e) {
             throw new BusinessException(
-                    "Formato de data inválido, ex: 2025-12-01T10:00:00"
-            );
+                    "Formato de data inválido. Use ISO-8601, ex: 2025-12-01T10:00:00");
         }
 
         if (inicio != null) {
@@ -329,6 +375,4 @@ public class EventoService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
-     
-
 }
