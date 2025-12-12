@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -14,22 +15,32 @@
 
     <HBox spacing="16.0">
         <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="8.0">
-            <Label text="Próximos Eventos" styleClass="text-muted"/>
+            <Label text="Proximos Eventos" styleClass="text-muted"/>
             <Label fx:id="lblTotalEventos" text="..." style="-fx-font-size: 36px; -fx-font-weight: 700; -fx-text-fill: white;"/>
-            <Label text="Eventos futuros disponíveis" style="-fx-font-size: 12px; -fx-text-fill: #52525b;"/>
+            <Label text="Eventos futuros disponiveis" style="-fx-font-size: 12px; -fx-text-fill: #52525b;"/>
         </VBox>
         
         <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="8.0">
-            <Label text="Inscrições Ativas" styleClass="text-muted"/>
+            <Label text="Inscricoes Ativas" styleClass="text-muted"/>
             <Label fx:id="lblInscricoes" text="..." style="-fx-font-size: 36px; -fx-font-weight: 700; -fx-text-fill: white;"/>
             <Label text="Confirmadas na tua agenda" style="-fx-font-size: 12px; -fx-text-fill: #52525b;"/>
         </VBox>
     </HBox>
 
+    <!-- Seccao de Anuncios Dinamicos (Destaque roxo) -->
+    <VBox fx:id="vboxAnuncios" spacing="12.0" 
+          style="-fx-background-color: linear-gradient(to right, #7c3aed, #9333ea); -fx-background-radius: 12; -fx-padding: 20;">
+        <Label text="Anuncios" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <VBox fx:id="containerAnuncios" spacing="10">
+            <Label fx:id="lblCarregandoAnuncios" text="A carregar anuncios..." style="-fx-text-fill: rgba(255,255,255,0.7);"/>
+        </VBox>
+    </VBox>
+
+    <!-- Avisos fixos do sistema -->
     <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="12.0">
-        <Label text="📢  Avisos da UPT" styleClass="h2"/>
-        <Label text="• O check-in nos eventos é obrigatório para emissão de certificado." styleClass="text-muted"/>
-        <Label text="• Novos workshops de tecnologia adicionados para o próximo mês." styleClass="text-muted"/>
-        <Label text="• Em caso de dúvida, contacte o suporte académico." styleClass="text-muted"/>
+        <Label text="Informacoes Uteis" styleClass="h2"/>
+        <Label text="O check-in nos eventos e obrigatorio para emissao de certificado." styleClass="text-muted"/>
+        <Label text="Guarde o QR code recebido apos a inscricao para fazer check-in." styleClass="text-muted"/>
+        <Label text="Em caso de duvida, contacte o suporte academico." styleClass="text-muted"/>
     </VBox>
 </VBox>
