@@ -21,28 +21,19 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * Controlador para o painel de Administração.
- * 
- * Gere todas as funcionalidades administrativas do sistema:
- * - CRUD de utilizadores (criar, editar, ativar/desativar)
- * - Visualização e gestão de eventos
- * - CRUD de locais
- * - Gestão de inscrições
- * - Visualização de logs de auditoria
- * 
+ * Controlador do painel de administração.
+ * Gere utilizadores, eventos, locais, inscrições e logs de auditoria.
  */
 public class AdminController implements Initializable {
 
-    //SERVIÇOS
-
+    // Serviços
     private final UtilizadorClientService utilizadorService = new UtilizadorClientService();
     private final EventoService eventoService = new EventoService();
     private final LocalClientService localService = new LocalClientService();
     private final InscricaoService inscricaoService = new InscricaoService();
     private final LogAuditoriaClientService logService = new LogAuditoriaClientService();
 
-    //COMPONENTES DE UI - UTILIZADORES
-
+    // Tabela de utilizadores
     @FXML
     private TableView<UtilizadorDTO> tblUtilizadores;
     @FXML
@@ -60,8 +51,7 @@ public class AdminController implements Initializable {
     @FXML
     private TextField txtPesquisaUtilizador;
 
-    //COMPONENTES DE UI - EVENTOS
-
+    // Tabela de eventos
     @FXML
     private TableView<EventoDTO> tblEventos;
     @FXML
@@ -77,8 +67,7 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<EventoDTO, Void> colAcoesEvento;
 
-    //COMPONENTES DE UI - LOCAIS
-
+    // Tabela de locais
     @FXML
     private TableView<LocalDTO> tblLocais;
     @FXML
@@ -92,8 +81,7 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<LocalDTO, Void> colAcoesLocal;
 
-    //COMPONENTES DE UI - INSCRIÇÕES
-
+    // Tabela de inscrições
     @FXML
     private TableView<InscricaoDTO> tblInscricoes;
     @FXML
@@ -113,8 +101,7 @@ public class AdminController implements Initializable {
     @FXML
     private ComboBox<String> cmbFiltroEvento;
 
-    //COMPONENTES DE UI - LOGS
-
+    // Tabela de logs
     @FXML
     private TableView<LogAuditoriaDTO> tblLogs;
     @FXML
@@ -148,7 +135,7 @@ public class AdminController implements Initializable {
         carregarUtilizadores();
     }
 
-    //UTILIZADORES
+    // Configuração da tabela de utilizadores
     private void setupUtilizadoresTable() {
         colNumero.setCellValueFactory(new PropertyValueFactory<>("numero"));
         colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
@@ -180,9 +167,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Carrega todos os utilizadores do sistema.
-     */
     @FXML
     public void carregarUtilizadores() {
         try {
@@ -193,9 +177,6 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * criar um novo utilizador.
-     */
     @FXML
     public void novoUtilizador() {
         Dialog<UtilizadorCreateDTO> dialog = createUtilizadorDialog(null);
@@ -215,9 +196,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * editar um utilizador existente.
-     */
     private void editarUtilizador(UtilizadorDTO user) {
         Dialog<UtilizadorCreateDTO> dialog = createUtilizadorDialog(user);
         Optional<UtilizadorCreateDTO> result = dialog.showAndWait();
@@ -236,9 +214,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Ativa ou desativa um utilizador.
-     */
     private void toggleAtivo(UtilizadorDTO user) {
         try {
             String acao = user.isAtivo() ? "desativar" : "ativar";
@@ -276,7 +251,6 @@ public class AdminController implements Initializable {
         Dialog<UtilizadorCreateDTO> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Novo Utilizador" : "Editar Utilizador");
 
-        // Aplicar estilo
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.setStyle("-fx-background-color: #1E1E1E;");
 
@@ -357,11 +331,7 @@ public class AdminController implements Initializable {
         return dialog;
     }
 
-    //EVENTOS
-
-    /**
-     * Configura a tabela de eventos.
-     */
+    // Configuração da tabela de eventos
     private void setupEventosTable() {
         colEventoId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colEventoTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
@@ -373,9 +343,6 @@ public class AdminController implements Initializable {
                 c.getValue().getLocalId() != null ? "Local #" + c.getValue().getLocalId() : ""));
     }
 
-    /**
-     * Carrega todos os eventos do sistema.
-     */
     @FXML
     public void carregarEventos() {
         try {
@@ -386,19 +353,12 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * Informa sobre a criação de eventos.
-     */
     @FXML
     public void novoEvento() {
         mostrarInfo("Para criar eventos, utilize o Painel Docente ou Painel Gestor.");
     }
 
-    //LOCAIS
-
-    /**
-     * Configura a tabela de locais com ações
-     */
+    // Configuração da tabela de locais
     private void setupLocaisTable() {
         colLocalId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colLocalNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
@@ -429,9 +389,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Carrega todos os locais do sistema
-     */
     @FXML
     public void carregarLocais() {
         try {
@@ -442,9 +399,6 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * criar um novo local
-     */
     @FXML
     public void novoLocal() {
         Dialog<LocalCreateDTO> dialog = createLocalDialog(null);
@@ -464,9 +418,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * editar um local existente
-     */
     private void editarLocal(LocalDTO local) {
         Dialog<LocalCreateDTO> dialog = createLocalDialog(local);
         Optional<LocalCreateDTO> result = dialog.showAndWait();
@@ -485,9 +436,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Apaga um local
-     */
     private void apagarLocal(LocalDTO local) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmar Eliminação");
@@ -574,11 +522,7 @@ public class AdminController implements Initializable {
         return dialog;
     }
 
-    //INSCRIÇÕES
-
-    /**
-     * Configura a tabela de inscrições
-     */
+    // Configuração da tabela de inscrições
     private void setupInscricoesTable() {
         colInscId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colInscEvento.setCellValueFactory(c -> new SimpleStringProperty(
@@ -592,19 +536,12 @@ public class AdminController implements Initializable {
         colInscCheckIn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isCheckIn() ? "✓" : "✗"));
     }
 
-    /**
-     * Carrega todas as inscrições do sistema
-     */
     @FXML
     public void carregarInscricoes() {
         mostrarInfo("Selecione um evento no filtro para ver as inscrições.");
     }
 
-    //LOGS
-
-    /**
-     * Configura a tabela de logs de auditoria.
-     */
+    // Configuração da tabela de logs
     private void setupLogsTable() {
         colLogId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colLogAcao.setCellValueFactory(new PropertyValueFactory<>("acao"));
@@ -617,9 +554,6 @@ public class AdminController implements Initializable {
         colLogMotivo.setCellValueFactory(new PropertyValueFactory<>("motivo"));
     }
 
-    /**
-     * Carrega todos os logs de auditoria
-     */
     @FXML
     public void carregarLogs() {
         try {
@@ -631,16 +565,12 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * Filtra os logs por data
-     */
     @FXML
     public void filtrarLogs() {
         carregarLogs();
     }
 
-    //MÉTODOS DE NOTIFICAÇÃO
-
+    // Métodos de notificação
     private Window getWindow() {
         return tblUtilizadores.getScene() != null ? tblUtilizadores.getScene().getWindow() : null;
     }
