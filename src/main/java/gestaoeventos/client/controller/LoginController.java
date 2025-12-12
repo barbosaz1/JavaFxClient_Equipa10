@@ -27,7 +27,7 @@ public class LoginController {
     private PasswordField txtPassword;
     
     @FXML 
-    private Label lblError; 
+    private Label lblError; // Corrigido para corresponder ao seu FXML antigo/Log de erro
     
     @FXML 
     private Button btnLogin;
@@ -47,7 +47,7 @@ public class LoginController {
         String numStr = txtNumero.getText().trim();
         String pass = txtPassword.getText().trim();
 
-        // Validação Local
+        // 1. Validação Local
         if (numStr.isEmpty() || pass.isEmpty()) {
             if (lblError != null) lblError.setText("⚠️ Preencha todos os campos.");
             shakeField(txtNumero);
@@ -64,13 +64,13 @@ public class LoginController {
             return;
         }
 
-        //Loading State (bloquear botão)
+        // 2. Loading State (bloquear botão)
         if (btnLogin != null) {
             btnLogin.setDisable(true);
             btnLogin.setText("A autenticar...");
         }
 
-        //Chamada Assíncrona (Task)
+        // 3. Chamada Assíncrona (Task)
         Task<LoginResponseDTO> task = new Task<>() {
             @Override
             protected LoginResponseDTO call() throws Exception {
@@ -95,12 +95,13 @@ public class LoginController {
             if (lblError != null) lblError.setText("❌ " + ex.getMessage());
         });
 
+        // Iniciar a thread
         new Thread(task).start();
     }
 
     private void shakeField(Node node) {
         if (node == null) return;
-        //borda vermelha
+        // Coloca borda vermelha
         node.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2px; -fx-border-radius: 6px;");
         
         // Remove borda após 2 segundos
