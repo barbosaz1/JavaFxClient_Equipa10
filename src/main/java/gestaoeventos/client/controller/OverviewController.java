@@ -27,10 +27,10 @@ public class OverviewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Boas vindas personalizada
+        // Saudação personalizada
         if (UserSession.getInstance().isLoggedIn()) {
             String nome = UserSession.getInstance().getUser().getNome();
-            // Apenas o primeiro nome
+            // Pega apenas o primeiro nome
             String primeiroNome = nome.contains(" ") ? nome.split(" ")[0] : nome;
             lblWelcome.setText("Olá, " + primeiroNome + " 👋");
         }
@@ -39,18 +39,18 @@ public class OverviewController implements Initializable {
     }
 
     private void carregarMétricasReais() {
-        // Tarefa em background
+        // Tarefa em background para não bloquear a UI
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                // Calcular Próximos Eventos
+                // 1. Calcular Próximos Eventos
                 List<EventoDTO> eventos = eventoService.listarTodos();
                 long proximos = eventos.stream()
                         .filter(e -> "PUBLICADO".equals(e.getEstado().toString()))
                         .filter(e -> e.getDataInicio() != null && e.getDataInicio().isAfter(LocalDateTime.now()))
                         .count();
 
-                // Calcular Minhas Inscrições Ativas
+                // 2. Calcular Minhas Inscrições Ativas
                 Integer userId = UserSession.getInstance().getUser().getNumero();
                 List<InscricaoDTO> inscricoes = inscricaoService.listarPorUtilizador(userId);
                 long ativas = inscricoes.stream()
