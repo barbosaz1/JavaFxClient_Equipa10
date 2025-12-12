@@ -76,7 +76,7 @@ public class InscricoesController implements Initializable {
 
         task.setOnSucceeded(e -> {
             showFeedback("Inscrição cancelada.", false);
-            carregarInscricoes(); // Recarrega a lista após o cancelamento
+            carregarInscricoes(); // Refresh
         });
         
         task.setOnFailed(e -> showFeedback("Erro ao cancelar: " + task.getException().getMessage(), true));
