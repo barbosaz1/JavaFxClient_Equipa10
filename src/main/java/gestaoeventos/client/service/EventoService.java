@@ -11,17 +11,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Serviço cliente para operações de Eventos na API REST.
- * 
- * Esta classe comunica com o servidor backend para realizar operações CRUD
- * em eventos, bem como operações específicas como inscrição e estatísticas.
- * 
+ * Serviço cliente para comunicação com a API de eventos.
  */
 public class EventoService extends ApiClient {
 
     /**
-     * Lista todos os eventos disponíveis no sistema.
-     * 
+     * Lista todos os eventos do sistema.
      */
     public List<EventoDTO> listarTodos() {
         try {
@@ -39,12 +34,11 @@ public class EventoService extends ApiClient {
     }
 
     /**
-     * Lista eventos organizados por um utilizador específico.
-     * 
+     * Lista eventos de um organizador específico.
      */
     public List<EventoDTO> listarPorOrganizador(Integer organizadorNumero) {
         try {
-            HttpRequest request = getBuilder("/eventos/pesquisa?organizadorNumero=" + organizadorNumero).build();
+            HttpRequest request = getBuilder("/eventos/search?organizadorNumero=" + organizadorNumero).build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 return mapper.readValue(response.body(), new TypeReference<List<EventoDTO>>() {
@@ -57,8 +51,7 @@ public class EventoService extends ApiClient {
     }
 
     /**
-     * Obtém estatísticas de um evento específico.
-     * 
+     * Obtém as estatísticas de um evento.
      */
     public EstatisticasEventoDTO obterEstatisticas(Integer eventoId) {
         try {
@@ -75,27 +68,30 @@ public class EventoService extends ApiClient {
 
     /**
      * Inscreve um utilizador num evento.
-     * 
+     * Devolve o resultado com o QR code para check-in.
      */
-    public String inscrever(Integer eventoId, Integer userNumero) {
+    public gestaoeventos.client.model.InscricaoResultado inscrever(Integer eventoId, Integer userNumero) {
         try {
             HttpRequest request = postBuilder("/eventos/" + eventoId + "/inscrever?utilizadorNumero=" + userNumero)
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return response.body();
+                return mapper.readValue(response.body(), gestaoeventos.client.model.InscricaoResultado.class);
             }
-            return "ERRO: " + response.statusCode();
+            gestaoeventos.client.model.InscricaoResultado erro = new gestaoeventos.client.model.InscricaoResultado();
+            erro.setResultado("ERRO: " + response.statusCode());
+            return erro;
         } catch (Exception e) {
             e.printStackTrace();
-            return "ERRO: " + e.getMessage();
+            gestaoeventos.client.model.InscricaoResultado erro = new gestaoeventos.client.model.InscricaoResultado();
+            erro.setResultado("ERRO: " + e.getMessage());
+            return erro;
         }
     }
 
     /**
-     * Cria um novo evento no sistema.
-     * 
+     * Cria um novo evento.
      */
     public EventoDTO criar(EventoCreateDTO dto) {
         try {
@@ -116,7 +112,6 @@ public class EventoService extends ApiClient {
 
     /**
      * Atualiza um evento existente.
-     * 
      */
     public EventoDTO atualizar(Integer id, EventoCreateDTO dto) {
         try {
@@ -137,8 +132,7 @@ public class EventoService extends ApiClient {
     }
 
     /**
-     * Obtém detalhes de um evento específico.
-     * 
+     * Obtém os dados de um evento pelo ID.
      */
     public EventoDTO obterPorId(Integer id) {
         try {
@@ -154,8 +148,7 @@ public class EventoService extends ApiClient {
     }
 
     /**
-     * Apaga um evento do sistema.
-     * 
+     * Apaga um evento.
      */
     public boolean apagar(Integer id) {
         try {
