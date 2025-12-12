@@ -117,5 +117,24 @@
             </VBox>
         </Tab>
         
+        <!-- Tab QR Code Check-in -->
+        <Tab text="✅ QR Code Check-in" closable="false">
+            <VBox spacing="20" style="-fx-padding: 20;" alignment="CENTER">
+                <Label text="Validação de Check-in" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Cole o token do QR code para validar a entrada de um participante." 
+                       style="-fx-text-fill: #9CA3AF;"/>
+                
+                <VBox maxWidth="500" spacing="15" styleClass="card" alignment="CENTER">
+                    <Label text="Token do QR Code" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="txtTokenCheckin" promptText="Ex: CHK-10-abc123..." 
+                               style="-fx-font-size: 14px;"/>
+                    <Button fx:id="btnValidarCheckin" text="✅ Validar Check-in" 
+                            onAction="#handleValidarCheckin" styleClass="btn-primary" maxWidth="Infinity"/>
+                    <Label fx:id="lblResultadoCheckin" wrapText="true" textAlignment="CENTER"/>
+                </VBox>
+            </VBox>
+        </Tab>
+        
     </TabPane>
 </VBox>
+
