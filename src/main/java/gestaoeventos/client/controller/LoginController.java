@@ -112,14 +112,12 @@ public class LoginController {
             Throwable ex = task.getException();
             String mensagem = ex.getMessage();
 
-            if (mensagem != null && (mensagem.contains("401") || mensagem.toLowerCase().contains("password")
-                    || mensagem.toLowerCase().contains("credenciais"))) {
-                mostrarErro("❌ Palavra-passe incorreta. Verifique os seus dados.");
-                shakeField(txtPassword);
-            } else if (mensagem != null
-                    && (mensagem.contains("404") || mensagem.toLowerCase().contains("não encontrado"))) {
-                mostrarErro("❌ Utilizador não encontrado.");
+            if (mensagem != null && mensagem.toLowerCase().contains("inativo")) {
+                mostrarErro("❌ " + mensagem);
                 shakeField(txtNumero);
+            } else if (mensagem != null && mensagem.toLowerCase().contains("credenciais")) {
+                mostrarErro("❌ Credenciais inválidas. Verifique os seus dados.");
+                shakeField(txtPassword);
             } else {
                 mostrarErro("❌ Erro de autenticação: " + (mensagem != null ? mensagem : "Verifique a ligação."));
             }
