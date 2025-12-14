@@ -10,20 +10,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Serviço cliente para operações de Certificados na API REST.
- * Esta classe permite gerir certificados emitidos para participantes de eventos:
- * 
+ * Servico cliente para operacoes de Certificados na API REST.
  * Suporta diferentes tipos de certificados:
- * - PRESENCA: Certificado básico automático
+ * - PRESENCA: Certificado basico automatico
  * - DOCENTE: Certificado emitido por docente (maior autoridade)
  * - ORGANIZADOR: Certificado emitido pelo organizador
- * 
  */
 public class CertificadoClientService extends ApiClient {
 
     /**
      * Lista todos os certificados de um utilizador.
-     * 
      */
     public List<CertificadoDTO> listarPorUtilizador(Integer utilizadorNumero) {
         try {
@@ -41,7 +37,6 @@ public class CertificadoClientService extends ApiClient {
 
     /**
      * Lista todos os certificados emitidos para um evento.
-     * 
      */
     public List<CertificadoDTO> listarPorEvento(Integer eventoId) {
         try {
@@ -58,16 +53,14 @@ public class CertificadoClientService extends ApiClient {
     }
 
     /**
-     * Emite um certificado básico de presença.
-     * 
+     * Emite um certificado basico de presenca.
      */
     public CertificadoDTO emitir(Integer inscricaoId, Integer emitidoPorNumero) {
         return emitirComTipo(inscricaoId, emitidoPorNumero, TipoCertificado.PRESENCA);
     }
 
     /**
-     * Emite um certificado com tipo específico.
-     * 
+     * Emite um certificado com tipo especifico.
      */
     public CertificadoDTO emitirComTipo(Integer inscricaoId, Integer emitidoPorNumero, TipoCertificado tipo) {
         try {
@@ -82,7 +75,7 @@ public class CertificadoClientService extends ApiClient {
             if (response.statusCode() == 200 || response.statusCode() == 201) {
                 return mapper.readValue(response.body(), CertificadoDTO.class);
             }
-            System.err.println("Erro ao emitir certificado: " + response.statusCode());
+            System.err.println("Erro ao emitir certificado: " + response.statusCode() + " - " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,20 +84,18 @@ public class CertificadoClientService extends ApiClient {
 
     /**
      * Emite certificados em massa para todos os participantes com check-in.
-     * 
      */
     public String emitirEmMassa(Integer eventoId, Integer emitidoPorNumero) {
         return emitirEmMassaComTipo(eventoId, emitidoPorNumero, TipoCertificado.PRESENCA);
     }
 
     /**
-     * Emite certificados em massa com tipo específico.
-     * 
+     * Emite certificados em massa com tipo especifico.
      */
     public String emitirEmMassaComTipo(Integer eventoId, Integer emitidoPorNumero, TipoCertificado tipo) {
         try {
-            String url = "/certificados/emitir-massa?eventoId=" + eventoId +
-                    "&emitidoPorNumero=" + emitidoPorNumero +
+            String url = "/certificados/emitir-em-massa/" + eventoId +
+                    "?emitidoPorNumero=" + emitidoPorNumero +
                     "&tipo=" + tipo.name();
 
             HttpRequest request = postBuilder(url)
@@ -123,8 +114,7 @@ public class CertificadoClientService extends ApiClient {
     }
 
     /**
-     * Verifica a autenticidade de um certificado pelo código.
-     * 
+     * Verifica a autenticidade de um certificado pelo codigo.
      */
     public CertificadoDTO verificar(String codigo) {
         try {
