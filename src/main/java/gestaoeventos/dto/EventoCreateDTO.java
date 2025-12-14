@@ -1,25 +1,28 @@
 package gestaoeventos.dto;
 
+import gestaoeventos.entity.EstadoEvento;
 import gestaoeventos.entity.TipoEvento;
 
 import java.time.LocalDateTime;
 
 public class EventoCreateDTO {
-	
+
 	private String titulo;
-    private String descricao;
-    private LocalDateTime dataInicio;
-    private LocalDateTime dataFim;
-    private Integer maxParticipantes;
-    private TipoEvento tipo;
-    private String areaTematica;
-    private Integer criadorNumero;
-    private Integer localId;
-    
-public EventoCreateDTO() {}
-    
-    // getters e setters ...
-    
+	private String descricao;
+	private LocalDateTime dataInicio;
+	private LocalDateTime dataFim;
+	private Integer maxParticipantes;
+	private TipoEvento tipo;
+	private String areaTematica;
+	private Integer criadorNumero;
+	private Integer localId;
+	private EstadoEvento estado;
+
+	public EventoCreateDTO() {
+	}
+
+	// getters e setters ...
+
 	public String getTitulo() {
 		return titulo;
 	}
@@ -90,6 +93,14 @@ public EventoCreateDTO() {}
 
 	public void setLocalId(Integer localId) {
 		this.localId = localId;
+	}
+
+	public EstadoEvento getEstado() {
+		return estado;
+	}
+
+	public void setEstado(EstadoEvento estado) {
+		this.estado = estado;
 	}
 
 }

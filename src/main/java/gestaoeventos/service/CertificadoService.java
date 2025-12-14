@@ -3,6 +3,7 @@ package gestaoeventos.service;
 import gestaoeventos.dto.CertificadoDTO;
 import gestaoeventos.entity.Certificado;
 import gestaoeventos.entity.Inscricao;
+import gestaoeventos.entity.TipoCertificado;
 import gestaoeventos.exception.BusinessException;
 import gestaoeventos.exception.NotFoundException;
 import gestaoeventos.repository.CertificadoRepository;
@@ -43,23 +44,35 @@ public class CertificadoService {
 
     public CertificadoDTO obterPorCodigo(String codigoVerificacao) {
         Certificado cert = certificadoRepository.findByCodigoVerificacao(codigoVerificacao)
-                .orElseThrow(() -> new NotFoundException("Certificado não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Certificado nao encontrado"));
         return toDTO(cert);
     }
 
+    /**
+     * Emite um certificado basico de presenca
+     */
     @Transactional
     public CertificadoDTO emitirCertificado(Integer inscricaoId, Integer emitidoPorNumero) {
-        // Verifica se já existe certificado para esta inscrição
+        return emitirCertificadoComTipo(inscricaoId, emitidoPorNumero, TipoCertificado.PRESENCA);
+    }
+
+    /**
+     * Emite um certificado com tipo especifico (DOCENTE tem mais valor)
+     */
+    @Transactional
+    public CertificadoDTO emitirCertificadoComTipo(Integer inscricaoId, Integer emitidoPorNumero,
+            TipoCertificado tipo) {
+        // Verifica se ja existe certificado para esta inscricao
         if (certificadoRepository.existsByInscricaoId(inscricaoId)) {
-            throw new BusinessException("Já existe um certificado emitido para esta inscrição");
+            throw new BusinessException("Ja existe um certificado emitido para esta inscricao");
         }
 
         Inscricao inscricao = inscricaoRepository.findById(inscricaoId)
-                .orElseThrow(() -> new NotFoundException("Inscrição não encontrada"));
+                .orElseThrow(() -> new NotFoundException("Inscricao nao encontrada"));
 
         // Verifica se o participante fez check-in
         if (!inscricao.isCheckIn()) {
-            throw new BusinessException("O participante não fez check-in neste evento");
+            throw new BusinessException("O participante nao fez check-in neste evento");
         }
 
         Certificado certificado = new Certificado();
@@ -67,6 +80,7 @@ public class CertificadoService {
         certificado.setDataEmissao(LocalDateTime.now());
         certificado.setCodigoVerificacao(gerarCodigoVerificacao());
         certificado.setEmitidoPorNumero(emitidoPorNumero);
+        certificado.setTipo(tipo != null ? tipo : TipoCertificado.PRESENCA);
 
         certificado = certificadoRepository.save(certificado);
         return toDTO(certificado);
@@ -74,6 +88,11 @@ public class CertificadoService {
 
     @Transactional
     public void emitirCertificadosEmMassa(Integer eventoId, Integer emitidoPorNumero) {
+        emitirCertificadosEmMassaComTipo(eventoId, emitidoPorNumero, TipoCertificado.PRESENCA);
+    }
+
+    @Transactional
+    public void emitirCertificadosEmMassaComTipo(Integer eventoId, Integer emitidoPorNumero, TipoCertificado tipo) {
         List<Inscricao> inscricoesComCheckin = inscricaoRepository.findByEventoIdAndCheckInTrue(eventoId);
 
         for (Inscricao inscricao : inscricoesComCheckin) {
@@ -83,6 +102,7 @@ public class CertificadoService {
                 certificado.setDataEmissao(LocalDateTime.now());
                 certificado.setCodigoVerificacao(gerarCodigoVerificacao());
                 certificado.setEmitidoPorNumero(emitidoPorNumero);
+                certificado.setTipo(tipo != null ? tipo : TipoCertificado.PRESENCA);
                 certificadoRepository.save(certificado);
             }
         }
@@ -103,6 +123,7 @@ public class CertificadoService {
         dto.setDataEmissao(cert.getDataEmissao());
         dto.setCodigoVerificacao(cert.getCodigoVerificacao());
         dto.setEmitidoPorNumero(cert.getEmitidoPorNumero());
+        dto.setTipo(cert.getTipo());
         return dto;
     }
 }

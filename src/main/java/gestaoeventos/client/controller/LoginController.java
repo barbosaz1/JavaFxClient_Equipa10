@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -20,114 +21,148 @@ import java.io.IOException;
 
 public class LoginController {
 
-    @FXML 
+    @FXML
     private TextField txtNumero;
-    
-    @FXML 
+    @FXML
     private PasswordField txtPassword;
-    
-    @FXML 
-    private Label lblError; 
-    
-    @FXML 
+    @FXML
+    private TextField txtPasswordVisible;
+    @FXML
+    private CheckBox chkMostrarPassword;
+    @FXML
+    private Label lblFeedback;
+    @FXML
     private Button btnLogin;
 
     private final AuthService authService = new AuthService();
 
     @FXML
     public void initialize() {
-        // Método opcional chamado automaticamente pelo JavaFX
+        if (txtPasswordVisible != null && txtPassword != null) {
+            txtPasswordVisible.textProperty().bindBidirectional(txtPassword.textProperty());
+        }
+    }
+
+    @FXML
+    void togglePasswordVisibility() {
+        if (chkMostrarPassword == null)
+            return;
+
+        boolean mostrar = chkMostrarPassword.isSelected();
+        txtPassword.setVisible(!mostrar);
+        txtPassword.setManaged(!mostrar);
+        txtPasswordVisible.setVisible(mostrar);
+        txtPasswordVisible.setManaged(mostrar);
+
+        if (mostrar) {
+            txtPasswordVisible.requestFocus();
+            txtPasswordVisible.positionCaret(txtPasswordVisible.getText().length());
+        } else {
+            txtPassword.requestFocus();
+            txtPassword.positionCaret(txtPassword.getText().length());
+        }
     }
 
     @FXML
     void handleLogin() {
-        // Limpar mensagens anteriores
-        if (lblError != null) lblError.setText("");
-        
+        if (lblFeedback != null)
+            lblFeedback.setText("");
+
         String numStr = txtNumero.getText().trim();
         String pass = txtPassword.getText().trim();
 
-        // Validação Local
         if (numStr.isEmpty() || pass.isEmpty()) {
-            if (lblError != null) lblError.setText("⚠️ Preencha todos os campos.");
+            mostrarErro("⚠️ Preencha todos os campos.");
             shakeField(txtNumero);
             return;
         }
 
-        // Tentar converter para Inteiro
         int numero;
         try {
             numero = Integer.parseInt(numStr);
         } catch (NumberFormatException e) {
-            if (lblError != null) lblError.setText("⚠️ O número deve ser numérico.");
+            mostrarErro("⚠️ O número deve ser numérico.");
             shakeField(txtNumero);
             return;
         }
 
-        //Loading State (bloquear botão)
         if (btnLogin != null) {
             btnLogin.setDisable(true);
             btnLogin.setText("A autenticar...");
         }
 
-        //Chamada Assíncrona (Task)
         Task<LoginResponseDTO> task = new Task<>() {
             @Override
             protected LoginResponseDTO call() throws Exception {
-                // Chama o serviço REST
                 return authService.login(numero, pass);
             }
         };
 
         task.setOnSucceeded(e -> {
-            // Sucesso: Guardar sessão e mudar de ecrã
             UserSession.getInstance().login(task.getValue());
             goToDashboard();
         });
 
         task.setOnFailed(e -> {
-            // Erro: Restaurar botão e mostrar mensagem
             if (btnLogin != null) {
                 btnLogin.setDisable(false);
-                btnLogin.setText("Entrar");
+                btnLogin.setText("Entrar no Portal");
             }
+
             Throwable ex = task.getException();
-            if (lblError != null) lblError.setText("❌ " + ex.getMessage());
+            String mensagem = ex.getMessage();
+
+            if (mensagem != null && mensagem.toLowerCase().contains("inativo")) {
+                mostrarErro("❌ " + mensagem);
+                shakeField(txtNumero);
+            } else if (mensagem != null && mensagem.toLowerCase().contains("credenciais")) {
+                mostrarErro("❌ Credenciais inválidas. Verifique os seus dados.");
+                shakeField(txtPassword);
+            } else {
+                mostrarErro("❌ Erro de autenticação: " + (mensagem != null ? mensagem : "Verifique a ligação."));
+            }
         });
 
         new Thread(task).start();
     }
 
+    private void mostrarErro(String mensagem) {
+        if (lblFeedback != null) {
+            lblFeedback.setText(mensagem);
+            lblFeedback.setStyle("-fx-text-fill: #ef4444;");
+        }
+    }
+
     private void shakeField(Node node) {
-        if (node == null) return;
-        //borda vermelha
+        if (node == null)
+            return;
         node.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2px; -fx-border-radius: 6px;");
-        
-        // Remove borda após 2 segundos
+
         new Thread(() -> {
-            try { Thread.sleep(2000); } catch (InterruptedException e) {}
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+            }
             Platform.runLater(() -> node.setStyle(""));
         }).start();
     }
-    
+
     private void goToDashboard() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MainLayout.fxml"));
             Parent root = loader.load();
-            
-            // Obter a Stage atual
+
             Stage stage = (Stage) txtNumero.getScene().getWindow();
             Scene scene = new Scene(root);
-            
-            // Carregar CSS
+
             scene.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
-            
+
             stage.setScene(scene);
             stage.centerOnScreen();
-            
+
         } catch (IOException e) {
             e.printStackTrace();
-            if (lblError != null) lblError.setText("Erro crítico: Não foi possível carregar o Dashboard.");
+            mostrarErro("Erro crítico: Não foi possível carregar o Dashboard.");
         }
     }
 }

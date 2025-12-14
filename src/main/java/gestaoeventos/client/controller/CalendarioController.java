@@ -43,6 +43,7 @@ public class CalendarioController implements Initializable {
     private final EventoService eventoService = new EventoService();
     private final InscricaoService inscricaoService = new InscricaoService();
     
+    // Cache de dados
     private List<EventoDTO> todosEventos = new ArrayList<>();
     private Set<Integer> meusEventosIds = new HashSet<>();
 
@@ -50,7 +51,7 @@ public class CalendarioController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         currentYearMonth = YearMonth.now();
         
-        //OTIMIZAÇÃO: Configurar a CellFactory apenas uma vez
+        // --- OTIMIZAÇÃO: Configurar a CellFactory apenas uma vez ---
         listaEventosDia.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(EventoDTO item, boolean empty) {
@@ -72,12 +73,13 @@ public class CalendarioController implements Initializable {
                     
                     setText(hora + " - " + titulo + status);
                     
-                    // Estilo do texto (garante contraste no tema)
+                    // Estilo do texto (garante contraste no tema dark)
                     getStyleClass().add("filled"); 
                 }
             }
         });
 
+        // Carregar dados iniciais
         carregarDadosEAtualizar();
     }
 
@@ -85,10 +87,10 @@ public class CalendarioController implements Initializable {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                // Procurar todos os eventos
+                // 1. Buscar todos os eventos
                 todosEventos = eventoService.listarTodos();
                 
-                // Procurar as minhas inscrições para destacar no calendário
+                // 2. Buscar minhas inscrições para destacar no calendário
                 Integer userId = UserSession.getInstance().getUser().getNumero();
                 List<InscricaoDTO> inscricoes = inscricaoService.listarPorUtilizador(userId);
                 
@@ -136,7 +138,7 @@ public class CalendarioController implements Initializable {
         if (!isCurrentMonth) lblDay.getStyleClass().add("other-month");
         cell.getChildren().add(lblDay);
 
-        // Verificar eventos neste dia para desenhar os pontos
+        // Verificar eventos neste dia para desenhar os "dots"
         List<EventoDTO> eventosDoDia = getEventosDoDia(date);
         
         if (!eventosDoDia.isEmpty()) {
@@ -177,7 +179,7 @@ public class CalendarioController implements Initializable {
 
         if (eventos.isEmpty()) {
             btnAcaoEvento.setDisable(true);
-            // TODO: adicionar um item placeholder na lista, ou deixar vazio
+            // Opcional: adicionar um item placeholder na lista, ou deixar vazio
         } else {
             listaEventosDia.getItems().addAll(eventos);
             btnAcaoEvento.setDisable(false);
@@ -194,14 +196,14 @@ public class CalendarioController implements Initializable {
             Scene scene = new Scene(loader.load());
             
             DetalhesEventoController controller = loader.getController();
-            // Passa callback para atualizar calendário
+            // Passa callback para atualizar calendário (caso o user se inscreva)
             controller.setEvento(selected, this::carregarDadosEAtualizar); 
 
             Stage modal = new Stage();
             modal.initModality(Modality.APPLICATION_MODAL);
             modal.setTitle("Detalhes do Evento");
             
-            // Garantir que CSS é aplicado
+            // Garantir que CSS é aplicado ao Modal também
             if (getClass().getResource("/css/app-theme.css") != null) {
                 scene.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
             }

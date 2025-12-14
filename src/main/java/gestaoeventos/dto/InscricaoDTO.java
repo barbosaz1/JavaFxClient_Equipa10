@@ -6,18 +6,21 @@ import java.time.LocalDateTime;
 
 public class InscricaoDTO {
 
-    private Integer id;
-    private Integer eventoId;
-    private Integer utilizadorNumero;
-    private LocalDateTime dataInscricao;
-    private EstadoInscricao estado;
-    private boolean checkIn;
-    private LocalDateTime dataCheckin;
+	private Integer id;
+	private Integer eventoId;
+	private String eventoTitulo;
+	private Integer utilizadorNumero;
+	private LocalDateTime dataInscricao;
+	private EstadoInscricao estado;
+	private boolean checkIn;
+	private LocalDateTime dataCheckin;
+	private String qrCodeToken;
 
-    public InscricaoDTO() {}
+	public InscricaoDTO() {
+	}
 
-    // getters e setters ...
-    
+	// getters e setters ...
+
 	public Integer getId() {
 		return id;
 	}
@@ -32,6 +35,14 @@ public class InscricaoDTO {
 
 	public void setEventoId(Integer eventoId) {
 		this.eventoId = eventoId;
+	}
+
+	public String getEventoTitulo() {
+		return eventoTitulo;
+	}
+
+	public void setEventoTitulo(String eventoTitulo) {
+		this.eventoTitulo = eventoTitulo;
 	}
 
 	public Integer getUtilizadorNumero() {
@@ -73,5 +84,13 @@ public class InscricaoDTO {
 	public void setDataCheckin(LocalDateTime dataCheckin) {
 		this.dataCheckin = dataCheckin;
 	}
-    
+
+	public String getQrCodeToken() {
+		return qrCodeToken;
+	}
+
+	public void setQrCodeToken(String qrCodeToken) {
+		this.qrCodeToken = qrCodeToken;
+	}
+
 }

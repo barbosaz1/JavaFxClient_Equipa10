@@ -50,7 +50,7 @@
         
         <ListView fx:id="listaEventosDia" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-control-inner-background: transparent;"/>
         
-        <Button fx:id="btnAcaoEvento" text="Ver Detalhes" maxWidth="Infinity" styleClass="btn-primary" disable="true"/>
+        <Button fx:id="btnAcaoEvento" text="Ver Detalhes" maxWidth="Infinity" styleClass="btn-primary" disable="true" onAction="#verDetalhes"/>
     </VBox>
 
 </HBox>

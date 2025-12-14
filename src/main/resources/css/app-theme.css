@@ -1,39 +1,46 @@
-
 /* ============================================================================= 
    VARIÁVEIS GLOBAIS 
    ============================================================================= */
 .root {
     /* --- Paleta Principal --- */
-    -color-bg-base:       #09090b;  /* Fundo base - quase preto */
-    -color-bg-sidebar:    #0c0c0e;  /* Sidebar */
-    -color-bg-card:       #18181b;  /* Cards e modais */
-    -color-bg-surface:    #27272a;  /* Inputs, tabelas */
-    -color-bg-hover:      #3f3f46;  /* Hover states */
-    
+    -color-bg-base: #09090b;
+    /* Fundo base - quase preto */
+    -color-bg-sidebar: #0c0c0e;
+    /* Sidebar */
+    -color-bg-card: #18181b;
+    /* Cards e modais */
+    -color-bg-surface: #27272a;
+    /* Inputs, tabelas */
+    -color-bg-hover: #3f3f46;
+    /* Hover states */
+
     /* --- Bordas --- */
     -color-border-subtle: #27272a;
-    -color-border-focus:  #6b4df7;
-    
+    -color-border-focus: #6b4df7;
+
     /* --- Texto --- */
-    -color-text-primary:  #fafafa;
-    -color-text-secondary:#a1a1aa;
-    -color-text-muted:    #71717a;
-    
+    -color-text-primary: #fafafa;
+    -color-text-secondary: #a1a1aa;
+    -color-text-muted: #71717a;
+
     /* --- Cores de Destaque (Gradiente Roxo Premium) --- */
-    -color-accent-1:      #6b4df7;  /* Roxo principal */
-    -color-accent-2:      #8b5cf6;  /* Roxo claro */
-    -color-accent-3:      #a78bfa;  /* Roxo mais claro */
-    -color-accent-glow:   rgba(107, 77, 247, 0.35);
-    
+    -color-accent-1: #6b4df7;
+    /* Roxo principal */
+    -color-accent-2: #8b5cf6;
+    /* Roxo claro */
+    -color-accent-3: #a78bfa;
+    /* Roxo mais claro */
+    -color-accent-glow: rgba(107, 77, 247, 0.35);
+
     /* --- Estados --- */
-    -color-success:       #22c55e;
-    -color-success-bg:    rgba(34, 197, 94, 0.1);
-    -color-danger:        #ef4444;
-    -color-danger-bg:     rgba(239, 68, 68, 0.1);
-    -color-warning:       #f59e0b;
-    -color-warning-bg:    rgba(245, 158, 11, 0.1);
-    -color-info:          #3b82f6;
-    -color-info-bg:       rgba(59, 130, 246, 0.1);
+    -color-success: #22c55e;
+    -color-success-bg: rgba(34, 197, 94, 0.1);
+    -color-danger: #ef4444;
+    -color-danger-bg: rgba(239, 68, 68, 0.1);
+    -color-warning: #f59e0b;
+    -color-warning-bg: rgba(245, 158, 11, 0.1);
+    -color-info: #3b82f6;
+    -color-info-bg: rgba(59, 130, 246, 0.1);
 
     /* --- Config Base --- */
     -fx-background-color: -color-bg-base;
@@ -57,10 +64,12 @@
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, -color-accent-glow, 12, 0.3, 0, 2);
 }
+
 .btn-primary:hover {
     -fx-background-color: linear-gradient(to bottom right, derive(-color-accent-1, 15%), derive(-color-accent-2, 15%));
     -fx-effect: dropshadow(gaussian, -color-accent-glow, 20, 0.5, 0, 3);
 }
+
 .btn-primary:pressed {
     -fx-background-color: linear-gradient(to bottom right, derive(-color-accent-1, -10%), derive(-color-accent-2, -10%));
     -fx-effect: dropshadow(gaussian, -color-accent-glow, 8, 0.2, 0, 1);
@@ -78,6 +87,7 @@
     -fx-padding: 10 20;
     -fx-cursor: hand;
 }
+
 .btn-secondary:hover {
     -fx-background-color: -color-bg-surface;
     -fx-border-color: -color-text-muted;
@@ -96,6 +106,7 @@
     -fx-padding: 8 16;
     -fx-cursor: hand;
 }
+
 .btn-danger:hover {
     -fx-background-color: -color-danger-bg;
 }
@@ -109,6 +120,7 @@
     -fx-cursor: hand;
     -fx-background-radius: 6;
 }
+
 .btn-icon:hover {
     -fx-background-color: -color-bg-hover;
     -fx-text-fill: -color-text-primary;
@@ -123,6 +135,7 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
+
 .btn-small:hover {
     -fx-background-color: -color-bg-hover;
     -fx-text-fill: -color-text-primary;
@@ -143,10 +156,12 @@
     -fx-border-color: transparent;
     -fx-border-width: 0 0 0 3;
 }
+
 .nav-btn:hover {
     -fx-background-color: rgba(255, 255, 255, 0.04);
     -fx-text-fill: -color-text-secondary;
 }
+
 .nav-btn.active {
     -fx-background-color: rgba(107, 77, 247, 0.12);
     -fx-text-fill: -color-accent-2;
@@ -163,7 +178,7 @@
     -fx-border-color: -color-border-subtle;
     -fx-border-radius: 12;
     -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0, 0, 2);
     -fx-padding: 20;
 }
 
@@ -175,7 +190,9 @@
 /* =============================================================================
    INPUTS E FORMS
    ============================================================================= */
-.text-field, .password-field, .text-area {
+.text-field,
+.password-field,
+.text-area {
     -fx-background-color: -color-bg-surface;
     -fx-text-fill: -color-text-primary;
     -fx-prompt-text-fill: -color-text-muted;
@@ -186,7 +203,10 @@
     -fx-padding: 10 14;
     -fx-font-size: 13px;
 }
-.text-field:focused, .password-field:focused, .text-area:focused {
+
+.text-field:focused,
+.password-field:focused,
+.text-area:focused {
     -fx-border-color: -color-accent-1;
     -fx-effect: dropshadow(gaussian, -color-accent-glow, 8, 0.2, 0, 0);
 }
@@ -198,16 +218,19 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
 }
+
 .combo-box .list-cell {
     -fx-background-color: transparent;
     -fx-text-fill: -color-text-primary;
     -fx-padding: 8 12;
 }
+
 .combo-box-popup .list-view {
     -fx-background-color: -color-bg-card;
     -fx-border-color: -color-border-subtle;
     -fx-border-radius: 8;
 }
+
 .combo-box-popup .list-cell:hover {
     -fx-background-color: -color-bg-hover;
 }
@@ -218,6 +241,7 @@
     -fx-border-color: -color-border-subtle;
     -fx-border-radius: 6;
 }
+
 .spinner .text-field {
     -fx-border-width: 0;
 }
@@ -228,6 +252,7 @@
     -fx-border-color: -color-border-subtle;
     -fx-border-radius: 8;
 }
+
 .date-picker .text-field {
     -fx-background-color: transparent;
     -fx-border-width: 0;
@@ -242,36 +267,44 @@
     -fx-border-radius: 10;
     -fx-background-radius: 10;
 }
+
 .table-view .column-header-background {
     -fx-background-color: -color-bg-base;
     -fx-background-radius: 10 10 0 0;
 }
+
 .table-view .column-header {
     -fx-background-color: transparent;
     -fx-border-color: transparent transparent -color-border-subtle transparent;
     -fx-border-width: 0 0 1 0;
 }
+
 .table-view .column-header .label {
     -fx-text-fill: -color-text-muted;
     -fx-font-weight: 600;
     -fx-font-size: 12px;
     -fx-padding: 12 16;
 }
+
 .table-row-cell {
     -fx-background-color: -color-bg-card;
     -fx-border-color: transparent transparent -color-border-subtle transparent;
     -fx-border-width: 0 0 1 0;
 }
+
 .table-row-cell:odd {
     -fx-background-color: derive(-color-bg-card, 3%);
 }
+
 .table-row-cell:hover {
     -fx-background-color: -color-bg-surface;
 }
+
 .table-row-cell:selected {
     -fx-background-color: rgba(107, 77, 247, 0.15);
     -fx-border-color: transparent transparent -color-accent-1 transparent;
 }
+
 .table-cell {
     -fx-text-fill: -color-text-primary;
     -fx-padding: 12 16;
@@ -290,27 +323,34 @@
 .tab-pane {
     -fx-background-color: transparent;
 }
+
 .tab-pane .tab-header-area {
     -fx-padding: 0 0 10 0;
 }
+
 .tab-pane .tab-header-background {
     -fx-background-color: transparent;
 }
+
 .tab {
     -fx-background-color: transparent;
     -fx-padding: 10 20;
 }
+
 .tab .tab-label {
     -fx-text-fill: -color-text-muted;
     -fx-font-weight: 500;
 }
+
 .tab:hover .tab-label {
     -fx-text-fill: -color-text-secondary;
 }
+
 .tab:selected {
     -fx-background-color: -color-bg-card;
     -fx-background-radius: 8 8 0 0;
 }
+
 .tab:selected .tab-label {
     -fx-text-fill: -color-text-primary;
     -fx-font-weight: 600;
@@ -324,20 +364,24 @@
     -fx-font-weight: 700;
     -fx-text-fill: -color-text-primary;
 }
+
 .h2 {
     -fx-font-size: 20px;
     -fx-font-weight: 600;
     -fx-text-fill: -color-text-primary;
 }
+
 .h3 {
     -fx-font-size: 16px;
     -fx-font-weight: 600;
     -fx-text-fill: -color-text-primary;
 }
+
 .text-muted {
     -fx-text-fill: -color-text-muted;
     -fx-font-size: 13px;
 }
+
 .text-small {
     -fx-font-size: 12px;
     -fx-text-fill: -color-text-secondary;
@@ -352,22 +396,27 @@
     -fx-font-size: 11px;
     -fx-font-weight: 600;
 }
+
 .badge-success {
     -fx-background-color: -color-success-bg;
     -fx-text-fill: -color-success;
 }
+
 .badge-danger {
     -fx-background-color: -color-danger-bg;
     -fx-text-fill: -color-danger;
 }
+
 .badge-warning {
     -fx-background-color: -color-warning-bg;
     -fx-text-fill: -color-warning;
 }
+
 .badge-info {
     -fx-background-color: -color-info-bg;
     -fx-text-fill: -color-info;
 }
+
 .badge-default {
     -fx-background-color: -color-bg-surface;
     -fx-text-fill: -color-text-muted;
@@ -378,10 +427,12 @@
     -fx-background-color: -color-success-bg;
     -fx-text-fill: -color-success;
 }
+
 .badge-cancelado {
     -fx-background-color: -color-danger-bg;
     -fx-text-fill: -color-danger;
 }
+
 .badge-rascunho {
     -fx-background-color: -color-bg-surface;
     -fx-text-fill: -color-text-muted;
@@ -397,11 +448,13 @@
     -fx-border-width: 0 0 1 0;
     -fx-alignment: CENTER_LEFT;
 }
+
 .window-title {
     -fx-font-weight: 600;
     -fx-text-fill: -color-text-muted;
     -fx-font-size: 12px;
 }
+
 .window-btn {
     -fx-background-color: transparent;
     -fx-text-fill: -color-text-muted;
@@ -410,10 +463,12 @@
     -fx-cursor: hand;
     -fx-background-radius: 4;
 }
+
 .window-btn:hover {
     -fx-background-color: -color-bg-surface;
     -fx-text-fill: -color-text-primary;
 }
+
 .window-close:hover {
     -fx-background-color: -color-danger;
     -fx-text-fill: white;
@@ -427,14 +482,17 @@
     -fx-border-color: -color-border-subtle;
     -fx-border-radius: 12;
 }
+
 .calendar-cell {
     -fx-border-color: -color-border-subtle;
     -fx-border-width: 0.5;
     -fx-background-color: transparent;
 }
+
 .calendar-cell:hover {
     -fx-background-color: -color-bg-surface;
 }
+
 .calendar-cell.selected {
     -fx-background-color: rgba(107, 77, 247, 0.15);
     -fx-border-color: -color-accent-2;
@@ -446,9 +504,11 @@
     -fx-min-height: 6px;
     -fx-background-radius: 50%;
 }
+
 .dot-has-event {
     -fx-fill: -color-text-muted;
 }
+
 .dot-my-event {
     -fx-fill: linear-gradient(to bottom right, -color-accent-2, -color-accent-1);
     -fx-effect: dropshadow(gaussian, -color-accent-1, 6, 0.6, 0, 0);
@@ -460,18 +520,22 @@
 .scroll-bar {
     -fx-background-color: transparent;
 }
+
 .scroll-bar .thumb {
     -fx-background-color: -color-bg-hover;
     -fx-background-radius: 10;
 }
+
 .scroll-bar .thumb:hover {
     -fx-background-color: -color-text-muted;
 }
+
 .scroll-bar .increment-button,
 .scroll-bar .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
 }
+
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
     -fx-background-color: transparent;
@@ -484,6 +548,7 @@
 .separator {
     -fx-background-color: -color-border-subtle;
 }
+
 .separator .line {
     -fx-border-color: -color-border-subtle;
     -fx-border-width: 1 0 0 0;
@@ -500,27 +565,234 @@
     -fx-background-radius: 6;
     -fx-padding: 8 12;
     -fx-font-size: 12px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 2);
 }
 
 /* =============================================================================
-   DIALOGS
+   DIALOGS - Premium Dark Theme
    ============================================================================= */
 .dialog-pane {
-    -fx-background-color: -color-bg-card;
-    -fx-border-color: -color-border-subtle;
+    -fx-background-color: #0f0f12;
+    -fx-border-color: #2a2a35;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 50, 0, 0, 12);
+    -fx-padding: 0;
 }
-.dialog-pane .header-panel {
-    -fx-background-color: transparent;
+
+.dialog-pane>.content {
+    -fx-background-color: #0f0f12;
+    -fx-padding: 24;
 }
-.dialog-pane .header-panel .label {
-    -fx-text-fill: -color-text-primary;
+
+.dialog-pane>.button-bar {
+    -fx-background-color: #0c0c0e;
+    -fx-padding: 16 24;
+    -fx-background-radius: 0 0 12 12;
+    -fx-border-color: #1f1f25;
+    -fx-border-width: 1 0 0 0;
+}
+
+.dialog-pane>.button-bar>.container {
+    -fx-spacing: 12;
+}
+
+/* Header do Dialog */
+.dialog-pane>.header-panel {
+    -fx-background-color: linear-gradient(to right, rgba(107, 77, 247, 0.12), transparent);
+    -fx-background-radius: 12 12 0 0;
+    -fx-padding: 20 24;
+    -fx-border-color: #1f1f25;
+    -fx-border-width: 0 0 1 0;
+}
+
+.dialog-pane>.header-panel>.label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 600;
+    -fx-font-size: 16px;
+}
+
+.dialog-pane .header-panel .graphic-container {
+    -fx-padding: 0 12 0 0;
+}
+
+/* Labels dentro de dialogs - IMPORTANTE: visibilidade */
+.dialog-pane .label {
+    -fx-text-fill: #e4e4e7;
+    -fx-font-size: 13px;
+}
+
+/* Labels em grids de formulário */
+.dialog-pane .grid-pane>.label {
+    -fx-text-fill: #a1a1aa;
+    -fx-font-weight: 500;
+    -fx-font-size: 13px;
+    -fx-min-width: 140;
+}
+
+/* Botões do Dialog */
+.dialog-pane .button-bar .button {
+    -fx-font-weight: 500;
+    -fx-font-size: 13px;
+    -fx-padding: 10 28;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button-bar .button:default {
+    -fx-background-color: linear-gradient(to bottom right, #6b4df7, #8b5cf6);
+    -fx-text-fill: white;
     -fx-font-weight: 600;
 }
-.dialog-pane .content {
-    -fx-padding: 20;
+
+.dialog-pane .button-bar .button:default:hover {
+    -fx-background-color: linear-gradient(to bottom right, #7c5df8, #9b6cf7);
+    -fx-effect: dropshadow(gaussian, rgba(107, 77, 247, 0.4), 12, 0.3, 0, 2);
+}
+
+.dialog-pane .button-bar .button:cancel {
+    -fx-background-color: #27272a;
+    -fx-text-fill: #a1a1aa;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+}
+
+.dialog-pane .button-bar .button:cancel:hover {
+    -fx-background-color: #3f3f46;
+    -fx-text-fill: #e4e4e7;
+}
+
+/* Inputs em Dialogs - melhor visibilidade */
+.dialog-pane .text-field,
+.dialog-pane .password-field {
+    -fx-background-color: #1a1a1f;
+    -fx-text-fill: #fafafa;
+    -fx-prompt-text-fill: #52525b;
+    -fx-border-color: #3f3f46;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+    -fx-min-height: 40;
+}
+
+.dialog-pane .text-area {
+    -fx-background-color: #1a1a1f;
+    -fx-text-fill: #fafafa;
+    -fx-prompt-text-fill: #52525b;
+    -fx-border-color: #3f3f46;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+}
+
+.dialog-pane .text-area .content {
+    -fx-background-color: #1a1a1f;
+}
+
+.dialog-pane .text-field:focused,
+.dialog-pane .password-field:focused,
+.dialog-pane .text-area:focused {
+    -fx-border-color: #6b4df7;
+    -fx-effect: dropshadow(gaussian, rgba(107, 77, 247, 0.25), 6, 0.15, 0, 0);
+}
+
+/* ComboBox em Dialogs */
+.dialog-pane .combo-box {
+    -fx-background-color: #1a1a1f;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-min-height: 40;
+}
+
+.dialog-pane .combo-box .list-cell {
+    -fx-text-fill: #fafafa;
+    -fx-background-color: transparent;
+    -fx-padding: 8 12;
+}
+
+.dialog-pane .combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.dialog-pane .combo-box .arrow {
+    -fx-background-color: #71717a;
+}
+
+/* DatePicker em Dialogs */
+.dialog-pane .date-picker {
+    -fx-background-color: #1a1a1f;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-min-height: 40;
+}
+
+.dialog-pane .date-picker .text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 6 10;
+    -fx-text-fill: #fafafa;
+}
+
+.dialog-pane .date-picker .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.dialog-pane .date-picker .arrow-button .arrow {
+    -fx-background-color: #71717a;
+}
+
+/* Spinner em Dialogs */
+.dialog-pane .spinner {
+    -fx-background-color: #1a1a1f;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.dialog-pane .spinner .text-field {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+    -fx-text-fill: #fafafa;
+    -fx-background-radius: 6 0 0 6;
+}
+
+.dialog-pane .spinner .increment-arrow-button,
+.dialog-pane .spinner .decrement-arrow-button {
+    -fx-background-color: #27272a;
+}
+
+.dialog-pane .spinner .increment-arrow-button:hover,
+.dialog-pane .spinner .decrement-arrow-button:hover {
+    -fx-background-color: #3f3f46;
+}
+
+.dialog-pane .spinner .increment-arrow-button .increment-arrow,
+.dialog-pane .spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: #71717a;
+}
+
+/* ScrollPane em Dialogs */
+.dialog-pane .scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: #0f0f12;
+}
+
+.dialog-pane .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Grid dentro de dialogs */
+.dialog-pane .grid-pane {
+    -fx-hgap: 16;
+    -fx-vgap: 14;
+    -fx-padding: 4 0;
 }
 
 /* =============================================================================
@@ -529,6 +801,7 @@
 .glow-effect {
     -fx-effect: dropshadow(gaussian, -color-accent-glow, 20, 0.4, 0, 0);
 }
+
 .subtle-shadow {
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 2);
 }

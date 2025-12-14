@@ -6,6 +6,7 @@ import gestaoeventos.dto.*;
 import gestaoeventos.entity.PerfilUtilizador;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -20,28 +21,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-/**
- * Controlador para o painel de Administração.
- * 
- * Gere todas as funcionalidades administrativas do sistema:
- * - CRUD de utilizadores (criar, editar, ativar/desativar)
- * - Visualização e gestão de eventos
- * - CRUD de locais
- * - Gestão de inscrições
- * - Visualização de logs de auditoria
- * 
- */
 public class AdminController implements Initializable {
-
-    //SERVIÇOS
 
     private final UtilizadorClientService utilizadorService = new UtilizadorClientService();
     private final EventoService eventoService = new EventoService();
     private final LocalClientService localService = new LocalClientService();
     private final InscricaoService inscricaoService = new InscricaoService();
     private final LogAuditoriaClientService logService = new LogAuditoriaClientService();
-
-    //COMPONENTES DE UI - UTILIZADORES
+    private final CertificadoClientService certificadoService = new CertificadoClientService();
 
     @FXML
     private TableView<UtilizadorDTO> tblUtilizadores;
@@ -60,8 +47,6 @@ public class AdminController implements Initializable {
     @FXML
     private TextField txtPesquisaUtilizador;
 
-    //COMPONENTES DE UI - EVENTOS
-
     @FXML
     private TableView<EventoDTO> tblEventos;
     @FXML
@@ -77,8 +62,6 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<EventoDTO, Void> colAcoesEvento;
 
-    //COMPONENTES DE UI - LOCAIS
-
     @FXML
     private TableView<LocalDTO> tblLocais;
     @FXML
@@ -91,8 +74,6 @@ public class AdminController implements Initializable {
     private TableColumn<LocalDTO, String> colLocalMorada;
     @FXML
     private TableColumn<LocalDTO, Void> colAcoesLocal;
-
-    //COMPONENTES DE UI - INSCRIÇÕES
 
     @FXML
     private TableView<InscricaoDTO> tblInscricoes;
@@ -112,8 +93,6 @@ public class AdminController implements Initializable {
     private TableColumn<InscricaoDTO, Void> colAcoesInscricao;
     @FXML
     private ComboBox<String> cmbFiltroEvento;
-
-    //COMPONENTES DE UI - LOGS
 
     @FXML
     private TableView<LogAuditoriaDTO> tblLogs;
@@ -136,6 +115,31 @@ public class AdminController implements Initializable {
     @FXML
     private DatePicker dpDataFim;
 
+    @FXML
+    private TextField txtTokenCheckin;
+    @FXML
+    private Button btnValidarCheckin;
+    @FXML
+    private Label lblResultadoCheckin;
+
+    // Certificados
+    @FXML
+    private ComboBox<EventoDTO> cmbEventosCertAdmin;
+    @FXML
+    private Label lblResultadoCertificadosAdmin;
+    @FXML
+    private TableView<CertificadoDTO> tblCertificadosAdmin;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminUtilizador;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminEvento;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminTipo;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminData;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminCodigo;
+
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
@@ -145,10 +149,10 @@ public class AdminController implements Initializable {
         setupLocaisTable();
         setupInscricoesTable();
         setupLogsTable();
+        setupCertificadosTable();
         carregarUtilizadores();
     }
 
-    //UTILIZADORES
     private void setupUtilizadoresTable() {
         colNumero.setCellValueFactory(new PropertyValueFactory<>("numero"));
         colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
@@ -180,9 +184,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Carrega todos os utilizadores do sistema.
-     */
     @FXML
     public void carregarUtilizadores() {
         try {
@@ -193,9 +194,6 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * criar um novo utilizador.
-     */
     @FXML
     public void novoUtilizador() {
         Dialog<UtilizadorCreateDTO> dialog = createUtilizadorDialog(null);
@@ -215,9 +213,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * editar um utilizador existente.
-     */
     private void editarUtilizador(UtilizadorDTO user) {
         Dialog<UtilizadorCreateDTO> dialog = createUtilizadorDialog(user);
         Optional<UtilizadorCreateDTO> result = dialog.showAndWait();
@@ -236,9 +231,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Ativa ou desativa um utilizador.
-     */
     private void toggleAtivo(UtilizadorDTO user) {
         try {
             String acao = user.isAtivo() ? "desativar" : "ativar";
@@ -275,10 +267,11 @@ public class AdminController implements Initializable {
     private Dialog<UtilizadorCreateDTO> createUtilizadorDialog(UtilizadorDTO existing) {
         Dialog<UtilizadorCreateDTO> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Novo Utilizador" : "Editar Utilizador");
+        dialog.setHeaderText(
+                existing == null ? "Preencha os dados do novo utilizador" : "Altere os dados do utilizador");
 
-        // Aplicar estilo
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #1E1E1E;");
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
 
         TextField tfNumero = new TextField();
         tfNumero.setPromptText("Número do utilizador");
@@ -287,7 +280,7 @@ public class AdminController implements Initializable {
         TextField tfEmail = new TextField();
         tfEmail.setPromptText("email@exemplo.com");
         PasswordField tfPassword = new PasswordField();
-        tfPassword.setPromptText("Password");
+        tfPassword.setPromptText(existing == null ? "Password" : "Nova password (deixe vazio para manter)");
         ComboBox<PerfilUtilizador> cbPerfil = new ComboBox<>(
                 FXCollections.observableArrayList(PerfilUtilizador.values()));
 
@@ -300,37 +293,19 @@ public class AdminController implements Initializable {
         }
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
 
-        String labelStyle = "-fx-text-fill: #E0E0E0; -fx-font-weight: bold;";
-        String inputStyle = "-fx-background-color: #2A2A2A; -fx-text-fill: white; -fx-prompt-text-fill: #6B7280;";
-
-        tfNumero.setStyle(inputStyle);
-        tfNome.setStyle(inputStyle);
-        tfEmail.setStyle(inputStyle);
-        tfPassword.setStyle(inputStyle);
-
-        Label lblNumero = new Label("Número:");
-        lblNumero.setStyle(labelStyle);
-        Label lblNome = new Label("Nome:");
-        lblNome.setStyle(labelStyle);
-        Label lblEmail = new Label("Email:");
-        lblEmail.setStyle(labelStyle);
-        Label lblPassword = new Label("Password:");
-        lblPassword.setStyle(labelStyle);
-        Label lblPerfil = new Label("Perfil:");
-        lblPerfil.setStyle(labelStyle);
-
-        grid.add(lblNumero, 0, 0);
+        grid.add(new Label("Número:"), 0, 0);
         grid.add(tfNumero, 1, 0);
-        grid.add(lblNome, 0, 1);
+        grid.add(new Label("Nome:"), 0, 1);
         grid.add(tfNome, 1, 1);
-        grid.add(lblEmail, 0, 2);
+        grid.add(new Label("Email:"), 0, 2);
         grid.add(tfEmail, 1, 2);
-        grid.add(lblPassword, 0, 3);
+        grid.add(new Label("Password:"), 0, 3);
         grid.add(tfPassword, 1, 3);
-        grid.add(lblPerfil, 0, 4);
+        grid.add(new Label("Perfil:"), 0, 4);
         grid.add(cbPerfil, 1, 4);
 
         dialogPane.setContent(grid);
@@ -357,11 +332,6 @@ public class AdminController implements Initializable {
         return dialog;
     }
 
-    //EVENTOS
-
-    /**
-     * Configura a tabela de eventos.
-     */
     private void setupEventosTable() {
         colEventoId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colEventoTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
@@ -373,9 +343,6 @@ public class AdminController implements Initializable {
                 c.getValue().getLocalId() != null ? "Local #" + c.getValue().getLocalId() : ""));
     }
 
-    /**
-     * Carrega todos os eventos do sistema.
-     */
     @FXML
     public void carregarEventos() {
         try {
@@ -386,19 +353,11 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * Informa sobre a criação de eventos.
-     */
     @FXML
     public void novoEvento() {
         mostrarInfo("Para criar eventos, utilize o Painel Docente ou Painel Gestor.");
     }
 
-    //LOCAIS
-
-    /**
-     * Configura a tabela de locais com ações
-     */
     private void setupLocaisTable() {
         colLocalId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colLocalNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
@@ -429,9 +388,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Carrega todos os locais do sistema
-     */
     @FXML
     public void carregarLocais() {
         try {
@@ -442,9 +398,6 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * criar um novo local
-     */
     @FXML
     public void novoLocal() {
         Dialog<LocalCreateDTO> dialog = createLocalDialog(null);
@@ -464,9 +417,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * editar um local existente
-     */
     private void editarLocal(LocalDTO local) {
         Dialog<LocalCreateDTO> dialog = createLocalDialog(local);
         Optional<LocalCreateDTO> result = dialog.showAndWait();
@@ -485,9 +435,6 @@ public class AdminController implements Initializable {
         });
     }
 
-    /**
-     * Apaga um local
-     */
     private void apagarLocal(LocalDTO local) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmar Eliminação");
@@ -511,9 +458,10 @@ public class AdminController implements Initializable {
     private Dialog<LocalCreateDTO> createLocalDialog(LocalDTO existing) {
         Dialog<LocalCreateDTO> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Novo Local" : "Editar Local");
+        dialog.setHeaderText(existing == null ? "Preencha os dados do novo local" : "Altere os dados do local");
 
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #1E1E1E;");
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
 
         TextField tfNome = new TextField();
         tfNome.setPromptText("Nome do local");
@@ -522,11 +470,6 @@ public class AdminController implements Initializable {
         TextField tfMorada = new TextField();
         tfMorada.setPromptText("Morada completa");
 
-        String inputStyle = "-fx-background-color: #2A2A2A; -fx-text-fill: white; -fx-prompt-text-fill: #6B7280;";
-        tfNome.setStyle(inputStyle);
-        tfCapacidade.setStyle(inputStyle);
-        tfMorada.setStyle(inputStyle);
-
         if (existing != null) {
             tfNome.setText(existing.getNome());
             tfCapacidade.setText(String.valueOf(existing.getCapacidade()));
@@ -534,22 +477,15 @@ public class AdminController implements Initializable {
         }
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
 
-        String labelStyle = "-fx-text-fill: #E0E0E0; -fx-font-weight: bold;";
-        Label lblNome = new Label("Nome:");
-        lblNome.setStyle(labelStyle);
-        Label lblCapacidade = new Label("Capacidade:");
-        lblCapacidade.setStyle(labelStyle);
-        Label lblMorada = new Label("Morada:");
-        lblMorada.setStyle(labelStyle);
-
-        grid.add(lblNome, 0, 0);
+        grid.add(new Label("Nome:"), 0, 0);
         grid.add(tfNome, 1, 0);
-        grid.add(lblCapacidade, 0, 1);
+        grid.add(new Label("Capacidade:"), 0, 1);
         grid.add(tfCapacidade, 1, 1);
-        grid.add(lblMorada, 0, 2);
+        grid.add(new Label("Morada:"), 0, 2);
         grid.add(tfMorada, 1, 2);
 
         dialogPane.setContent(grid);
@@ -574,37 +510,25 @@ public class AdminController implements Initializable {
         return dialog;
     }
 
-    //INSCRIÇÕES
-
-    /**
-     * Configura a tabela de inscrições
-     */
     private void setupInscricoesTable() {
         colInscId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colInscEvento.setCellValueFactory(c -> new SimpleStringProperty(
-                "Evento #" + c.getValue().getEventoId()));
+                c.getValue().getEventoTitulo() != null ? c.getValue().getEventoTitulo()
+                        : "Evento #" + c.getValue().getEventoId()));
         colInscUtilizador.setCellValueFactory(c -> new SimpleStringProperty(
                 "User #" + c.getValue().getUtilizadorNumero()));
         colInscData.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getDataInscricao() != null ? c.getValue().getDataInscricao().format(DTF) : ""));
         colInscEstado.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getEstado() != null ? c.getValue().getEstado().toString() : ""));
-        colInscCheckIn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isCheckIn() ? "✓" : "✗"));
+        colInscCheckIn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isCheckIn() ? "Sim" : "Nao"));
     }
 
-    /**
-     * Carrega todas as inscrições do sistema
-     */
     @FXML
     public void carregarInscricoes() {
         mostrarInfo("Selecione um evento no filtro para ver as inscrições.");
     }
 
-    //LOGS
-
-    /**
-     * Configura a tabela de logs de auditoria.
-     */
     private void setupLogsTable() {
         colLogId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colLogAcao.setCellValueFactory(new PropertyValueFactory<>("acao"));
@@ -617,9 +541,97 @@ public class AdminController implements Initializable {
         colLogMotivo.setCellValueFactory(new PropertyValueFactory<>("motivo"));
     }
 
-    /**
-     * Carrega todos os logs de auditoria
-     */
+    private void setupCertificadosTable() {
+        // Configurar combo de eventos para certificados
+        if (cmbEventosCertAdmin != null) {
+            try {
+                List<EventoDTO> eventos = eventoService.listarTodos();
+                cmbEventosCertAdmin.setItems(FXCollections.observableArrayList(eventos));
+                cmbEventosCertAdmin.setConverter(new javafx.util.StringConverter<>() {
+                    @Override
+                    public String toString(EventoDTO e) {
+                        return e != null ? e.getTitulo() : "";
+                    }
+
+                    @Override
+                    public EventoDTO fromString(String s) {
+                        return null;
+                    }
+                });
+
+                // Ao selecionar evento, carregar certificados
+                cmbEventosCertAdmin.valueProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null) {
+                        carregarCertificadosEvento(newVal.getId());
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao configurar combo certificados: " + e.getMessage());
+            }
+        }
+
+        // Configurar colunas da tabela
+        if (colCertAdminUtilizador != null) {
+            colCertAdminUtilizador.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getUtilizadorNome() != null ? c.getValue().getUtilizadorNome()
+                            : "User #" + c.getValue().getUtilizadorNumero()));
+        }
+        if (colCertAdminEvento != null) {
+            colCertAdminEvento.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getEventoTitulo() != null ? c.getValue().getEventoTitulo() : ""));
+        }
+        if (colCertAdminTipo != null) {
+            colCertAdminTipo.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getTipoDescricao() != null ? c.getValue().getTipoDescricao()
+                            : (c.getValue().getTipo() != null ? c.getValue().getTipo().getDescricao() : "Presenca")));
+        }
+        if (colCertAdminData != null) {
+            colCertAdminData.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getDataEmissao() != null ? c.getValue().getDataEmissao().format(DTF) : ""));
+        }
+        if (colCertAdminCodigo != null) {
+            colCertAdminCodigo.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getCodigoVerificacao() != null ? c.getValue().getCodigoVerificacao() : ""));
+        }
+    }
+
+    private void carregarCertificadosEvento(Integer eventoId) {
+        if (tblCertificadosAdmin == null)
+            return;
+        try {
+            List<CertificadoDTO> certs = certificadoService.listarPorEvento(eventoId);
+            tblCertificadosAdmin.setItems(FXCollections.observableArrayList(certs));
+        } catch (Exception e) {
+            mostrarErro("Erro ao carregar certificados: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void emitirCertificadosEmMassa() {
+        EventoDTO selected = cmbEventosCertAdmin != null ? cmbEventosCertAdmin.getValue() : null;
+        if (selected == null) {
+            mostrarAviso("Selecione um evento.");
+            return;
+        }
+        if (!gestaoeventos.client.model.UserSession.getInstance().isLoggedIn())
+            return;
+
+        try {
+            Integer emitidoPor = gestaoeventos.client.model.UserSession.getInstance().getUser().getNumero();
+            // Admin emite certificado tipo PRESENCA (basico)
+            String resultado = certificadoService.emitirEmMassaComTipo(
+                    selected.getId(), emitidoPor, gestaoeventos.entity.TipoCertificado.PRESENCA);
+
+            if (lblResultadoCertificadosAdmin != null) {
+                lblResultadoCertificadosAdmin.setText(resultado);
+            }
+            mostrarSucesso("Certificados de Presenca emitidos!");
+            carregarCertificadosEvento(selected.getId());
+        } catch (Exception e) {
+            mostrarErro("Erro ao emitir certificados: " + e.getMessage());
+        }
+    }
+
     @FXML
     public void carregarLogs() {
         try {
@@ -631,15 +643,56 @@ public class AdminController implements Initializable {
         }
     }
 
-    /**
-     * Filtra os logs por data
-     */
     @FXML
     public void filtrarLogs() {
         carregarLogs();
     }
 
-    //MÉTODOS DE NOTIFICAÇÃO
+    @FXML
+    void handleValidarCheckin() {
+        if (txtTokenCheckin == null)
+            return;
+
+        String token = txtTokenCheckin.getText().trim();
+        if (token.isEmpty()) {
+            lblResultadoCheckin.setText("Por favor introduza o código do QR.");
+            lblResultadoCheckin.setStyle("-fx-text-fill: #ef4444;");
+            return;
+        }
+
+        btnValidarCheckin.setDisable(true);
+        lblResultadoCheckin.setText("A validar...");
+        lblResultadoCheckin.setStyle("-fx-text-fill: #9CA3AF;");
+
+        Task<InscricaoDTO> task = new Task<>() {
+            @Override
+            protected InscricaoDTO call() throws Exception {
+                return inscricaoService.checkinPorQrCode(token);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            InscricaoDTO dto = task.getValue();
+            if (dto != null) {
+                lblResultadoCheckin.setText("✅ Check-in confirmado com sucesso!\nInscrição #" + dto.getId());
+                lblResultadoCheckin.setStyle("-fx-text-fill: #22c55e;");
+                txtTokenCheckin.clear();
+                mostrarSucesso("Check-in validado com sucesso!");
+            } else {
+                lblResultadoCheckin.setText("❌ Token inválido ou já utilizado.");
+                lblResultadoCheckin.setStyle("-fx-text-fill: #ef4444;");
+            }
+            btnValidarCheckin.setDisable(false);
+        });
+
+        task.setOnFailed(e -> {
+            lblResultadoCheckin.setText("❌ Erro: " + task.getException().getMessage());
+            lblResultadoCheckin.setStyle("-fx-text-fill: #ef4444;");
+            btnValidarCheckin.setDisable(false);
+        });
+
+        new Thread(task).start();
+    }
 
     private Window getWindow() {
         return tblUtilizadores.getScene() != null ? tblUtilizadores.getScene().getWindow() : null;
@@ -647,29 +700,25 @@ public class AdminController implements Initializable {
 
     private void mostrarSucesso(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.sucesso(window, mensagem);
-        }
     }
 
     private void mostrarErro(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.erro(window, mensagem);
-        }
     }
 
     private void mostrarAviso(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.aviso(window, mensagem);
-        }
     }
 
     private void mostrarInfo(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.info(window, mensagem);
-        }
     }
 }

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -34,7 +37,12 @@
 
             <VBox spacing="8.0">
                 <Label text="Palavra-passe" styleClass="text-muted"/>
-                <PasswordField fx:id="txtPassword" />
+                <StackPane>
+                    <PasswordField fx:id="txtPassword" />
+                    <TextField fx:id="txtPasswordVisible" visible="false" managed="false" />
+                </StackPane>
+                <CheckBox fx:id="chkMostrarPassword" text="Mostrar palavra-passe" 
+                          onAction="#togglePasswordVisibility" style="-fx-text-fill: #9CA3AF;"/>
             </VBox>
 
             <Label fx:id="lblFeedback" textFill="#ef4444" wrapText="true" minHeight="20"/>

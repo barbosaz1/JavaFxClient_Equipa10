@@ -35,9 +35,16 @@ public class Notificacao {
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
-    public Notificacao() {}
+    @Column(name = "data_inicio_exibicao")
+    private LocalDateTime dataInicioExibicao;
 
-    // GETTERS & SETTERS 
+    @Column(name = "data_fim_exibicao")
+    private LocalDateTime dataFimExibicao;
+
+    public Notificacao() {
+    }
+
+    // GETTERS & SETTERS
 
     public Integer getId() {
         return id;
@@ -101,5 +108,32 @@ public class Notificacao {
 
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
+    }
+
+    public LocalDateTime getDataInicioExibicao() {
+        return dataInicioExibicao;
+    }
+
+    public void setDataInicioExibicao(LocalDateTime dataInicioExibicao) {
+        this.dataInicioExibicao = dataInicioExibicao;
+    }
+
+    public LocalDateTime getDataFimExibicao() {
+        return dataFimExibicao;
+    }
+
+    public void setDataFimExibicao(LocalDateTime dataFimExibicao) {
+        this.dataFimExibicao = dataFimExibicao;
+    }
+
+    public boolean isVisivelAgora() {
+        LocalDateTime agora = LocalDateTime.now();
+        if (dataInicioExibicao != null && agora.isBefore(dataInicioExibicao)) {
+            return false;
+        }
+        if (dataFimExibicao != null && agora.isAfter(dataFimExibicao)) {
+            return false;
+        }
+        return true;
     }
 }

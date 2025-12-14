@@ -11,31 +11,31 @@
       fx:controller="gestaoeventos.client.controller.InscricoesController">
 
     <VBox spacing="4.0">
-        <Label text="Minhas Inscrições" styleClass="h1"/>
-        <Label text="Gerir estado das suas participações." styleClass="text-muted"/>
+        <Label text="Minhas Inscricoes" styleClass="h1"/>
+        <Label text="Gerir estado das suas participacoes." styleClass="text-muted"/>
     </VBox>
 
     <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="16.0">
         <HBox alignment="CENTER_LEFT" spacing="12.0">
-            <Button text="🔄 Atualizar Lista" onAction="#carregarInscricoes" styleClass="nav-btn"/>
+            <Button text="Atualizar Lista" onAction="#carregarInscricoes" styleClass="nav-btn"/>
             <Label fx:id="lblStatus" style="-fx-font-weight: bold;"/>
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnCancelar" text="Cancelar Inscrição" onAction="#handleCancelar" 
+            <Button fx:id="btnCancelar" text="Cancelar Inscricao" onAction="#handleCancelar" 
                     styleClass="btn-danger" disable="true"/>
         </HBox>
 
         <TableView fx:id="tabelaInscricoes" VBox.vgrow="ALWAYS">
             <placeholder>
                 <VBox alignment="CENTER" spacing="10">
-                    <Label text="🎫" style="-fx-font-size: 32px;"/>
-                    <Label text="Ainda não tens inscrições ativas." styleClass="text-muted"/>
+                    <Label text="Ainda nao tens inscricoes ativas." styleClass="text-muted"/>
                 </VBox>
             </placeholder>
             <columns>
-                <TableColumn fx:id="colEvento" text="EVENTO" prefWidth="250.0" />
-                <TableColumn fx:id="colData" text="DATA INSCRIÇÃO" prefWidth="150.0" />
-                <TableColumn fx:id="colEstado" text="ESTADO" prefWidth="120.0" />
-                <TableColumn fx:id="colCheckIn" text="CHECK-IN" prefWidth="100.0" />
+                <TableColumn fx:id="colEvento" text="EVENTO" prefWidth="200.0" />
+                <TableColumn fx:id="colData" text="DATA INSCRICAO" prefWidth="130.0" />
+                <TableColumn fx:id="colEstado" text="ESTADO" prefWidth="100.0" />
+                <TableColumn fx:id="colCheckIn" text="CHECK-IN" prefWidth="80.0" />
+                <TableColumn fx:id="colToken" text="TOKEN CHECK-IN" prefWidth="180.0" />
             </columns>
             <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
         </TableView>

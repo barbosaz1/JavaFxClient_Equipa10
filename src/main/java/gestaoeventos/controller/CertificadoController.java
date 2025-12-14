@@ -1,13 +1,13 @@
 package gestaoeventos.controller;
 
 import gestaoeventos.dto.CertificadoDTO;
+import gestaoeventos.entity.TipoCertificado;
 import gestaoeventos.service.CertificadoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/certificados")
@@ -35,18 +35,41 @@ public class CertificadoController {
     }
 
     @PostMapping("/emitir")
-    public ResponseEntity<CertificadoDTO> emitirCertificado(@RequestBody Map<String, Integer> body) {
-        Integer inscricaoId = body.get("inscricaoId");
-        Integer emitidoPorNumero = body.get("emitidoPorNumero");
-        CertificadoDTO certificado = certificadoService.emitirCertificado(inscricaoId, emitidoPorNumero);
+    public ResponseEntity<CertificadoDTO> emitirCertificado(
+            @RequestParam Integer inscricaoId,
+            @RequestParam Integer emitidoPorNumero,
+            @RequestParam(required = false) String tipo) {
+
+        TipoCertificado tipoCert = TipoCertificado.PRESENCA;
+        if (tipo != null && !tipo.isEmpty()) {
+            try {
+                tipoCert = TipoCertificado.valueOf(tipo);
+            } catch (IllegalArgumentException e) {
+                // mantém PRESENCA como default
+            }
+        }
+
+        CertificadoDTO certificado = certificadoService.emitirCertificadoComTipo(inscricaoId, emitidoPorNumero,
+                tipoCert);
         return ResponseEntity.status(HttpStatus.CREATED).body(certificado);
     }
 
     @PostMapping("/emitir-em-massa/{eventoId}")
     public ResponseEntity<String> emitirCertificadosEmMassa(
             @PathVariable Integer eventoId,
-            @RequestParam Integer emitidoPorNumero) {
-        certificadoService.emitirCertificadosEmMassa(eventoId, emitidoPorNumero);
+            @RequestParam Integer emitidoPorNumero,
+            @RequestParam(required = false) String tipo) {
+
+        TipoCertificado tipoCert = TipoCertificado.PRESENCA;
+        if (tipo != null && !tipo.isEmpty()) {
+            try {
+                tipoCert = TipoCertificado.valueOf(tipo);
+            } catch (IllegalArgumentException e) {
+                // mantém PRESENCA como default
+            }
+        }
+
+        certificadoService.emitirCertificadosEmMassaComTipo(eventoId, emitidoPorNumero, tipoCert);
         return ResponseEntity.ok("Certificados emitidos com sucesso para todos os participantes com check-in");
     }
 }

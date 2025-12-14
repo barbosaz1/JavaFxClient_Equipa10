@@ -6,34 +6,34 @@
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="gestaoeventos.client.controller.DocenteController">
     
-    <Label text="👨‍🏫 Painel do Docente" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: -color-text-primary;"/>
+    <Label text="Painel do Docente" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: -color-text-primary;"/>
     
     <TabPane VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
         
         <!-- Tab Meus Eventos -->
-        <Tab text="📅 Meus Eventos" closable="false">
+        <Tab text="Meus Eventos" closable="false">
             <VBox spacing="15" style="-fx-padding: 20;">
                 <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Button text="➕ Criar Evento" onAction="#criarEvento" styleClass="btn-primary"/>
-                    <Button text="🔄 Atualizar" onAction="#carregarEventos" styleClass="btn-secondary"/>
+                    <Button text="Criar Evento" onAction="#criarEvento" styleClass="btn-primary"/>
+                    <Button text="Atualizar" onAction="#carregarEventos" styleClass="btn-secondary"/>
                 </HBox>
                 <TableView fx:id="tblEventos" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colEventoTitulo" text="Título" prefWidth="200"/>
+                        <TableColumn fx:id="colEventoTitulo" text="Titulo" prefWidth="200"/>
                         <TableColumn fx:id="colEventoData" text="Data" prefWidth="150"/>
                         <TableColumn fx:id="colEventoEstado" text="Estado" prefWidth="100"/>
-                        <TableColumn fx:id="colEventoAcoes" text="Ações" prefWidth="150"/>
+                        <TableColumn fx:id="colEventoAcoes" text="Acoes" prefWidth="150"/>
                     </columns>
                 </TableView>
             </VBox>
         </Tab>
         
-        <!-- Tab Presenças -->
-        <Tab text="✅ Registar Presenças" closable="false">
+        <!-- Tab Presencas -->
+        <Tab text="Registar Presencas" closable="false">
             <VBox spacing="15" style="-fx-padding: 20;">
-                <Label text="Selecione um evento para gerir presenças:" style="-fx-font-weight: bold;"/>
+                <Label text="Selecione um evento para gerir presencas:" style="-fx-font-weight: bold;"/>
                 <ComboBox fx:id="cmbEventosPresencas" promptText="Selecionar evento..." prefWidth="300"/>
-                <Button text="🔍 Ver Inscritos" onAction="#carregarInscritos" styleClass="btn-primary"/>
+                <Button text="Ver Inscritos" onAction="#carregarInscritos" styleClass="btn-primary"/>
                 
                 <Separator/>
                 
@@ -42,7 +42,7 @@
                         <TableColumn fx:id="colInscritoNome" text="Utilizador" prefWidth="200"/>
                         <TableColumn fx:id="colInscritoEstado" text="Estado" prefWidth="100"/>
                         <TableColumn fx:id="colInscritoCheckIn" text="Check-in" prefWidth="80"/>
-                        <TableColumn fx:id="colInscritoAcoes" text="Ações" prefWidth="200"/>
+                        <TableColumn fx:id="colInscritoAcoes" text="Acoes" prefWidth="200"/>
                     </columns>
                     <placeholder>
                         <Label text="Selecione um evento para ver os inscritos."/>
@@ -52,39 +52,40 @@
         </Tab>
         
         <!-- Tab Certificados -->
-        <Tab text="📜 Emitir Certificados" closable="false">
+        <Tab text="Emitir Certificados" closable="false">
             <VBox spacing="15" style="-fx-padding: 20;">
                 <Label text="Emitir certificados para participantes com check-in:" style="-fx-font-weight: bold;"/>
+                <Label text="Certificados emitidos por Docente tem maior valor." style="-fx-text-fill: #22c55e; -fx-font-style: italic;"/>
                 <ComboBox fx:id="cmbEventosCertificados" promptText="Selecionar evento..." prefWidth="300"/>
                 <HBox spacing="10">
-                    <Button text="📜 Emitir para Todos" onAction="#emitirCertificadosEmMassa" styleClass="btn-primary"/>
+                    <Button text="Emitir para Todos" onAction="#emitirCertificadosEmMassa" styleClass="btn-primary"/>
                 </HBox>
                 <Label fx:id="lblResultadoCertificados" style="-fx-text-fill: -color-success;"/>
                 
                 <Separator/>
                 
-                <Label text="Certificados já emitidos:" style="-fx-font-weight: bold;"/>
+                <Label text="Certificados ja emitidos:" style="-fx-font-weight: bold;"/>
                 <TableView fx:id="tblCertificadosEmitidos" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colCertUtilizador" text="Utilizador" prefWidth="200"/>
-                        <TableColumn fx:id="colCertData" text="Data Emissão" prefWidth="150"/>
-                        <TableColumn fx:id="colCertCodigo" text="Código" prefWidth="200"/>
+                        <TableColumn fx:id="colCertData" text="Data Emissao" prefWidth="150"/>
+                        <TableColumn fx:id="colCertCodigo" text="Codigo" prefWidth="200"/>
                     </columns>
                 </TableView>
             </VBox>
         </Tab>
         
-        <!-- Tab Estatísticas -->
-        <Tab text="📊 Estatísticas" closable="false">
+        <!-- Tab Estatisticas -->
+        <Tab text="Estatisticas" closable="false">
             <VBox spacing="15" style="-fx-padding: 20;">
-                <Label text="Selecione um evento para ver estatísticas:" style="-fx-font-weight: bold;"/>
+                <Label text="Selecione um evento para ver estatisticas:" style="-fx-font-weight: bold;"/>
                 <ComboBox fx:id="cmbEventosStats" promptText="Selecionar evento..." prefWidth="300"/>
-                <Button text="📈 Ver Estatísticas" onAction="#verEstatisticas" styleClass="btn-primary"/>
+                <Button text="Ver Estatisticas" onAction="#verEstatisticas" styleClass="btn-primary"/>
                 
                 <Separator/>
                 
                 <GridPane fx:id="gridEstatisticas" hgap="20" vgap="10" visible="false">
-                    <Label text="Total Inscrições:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                    <Label text="Total Inscricoes:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
                     <Label fx:id="lblTotalInscricoes" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                     
                     <Label text="Check-ins Realizados:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
@@ -93,7 +94,7 @@
                     <Label text="Certificados Emitidos:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
                     <Label fx:id="lblCertificados" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                     
-                    <Label text="Taxa de Ocupação:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+                    <Label text="Taxa de Ocupacao:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
                     <Label fx:id="lblOcupacao" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
                 </GridPane>
             </VBox>

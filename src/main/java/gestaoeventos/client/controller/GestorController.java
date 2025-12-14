@@ -7,6 +7,7 @@ import gestaoeventos.client.util.ToastNotification;
 import gestaoeventos.dto.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -16,27 +17,24 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 
 import java.net.URL;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * 
- * Gere as funcionalidades específicas do perfil Gestor:
- * - Gerir locais de eventos (visualização)
- * - Criar e gerir eventos
- * - Visualizar estatísticas
- * - Enviar anúncios para todos os utilizadores
- * 
+ * Controlador do painel do Gestor de Eventos.
  */
 public class GestorController implements Initializable {
 
     private final LocalClientService localService = new LocalClientService();
     private final EventoService eventoService = new EventoService();
     private final NotificacaoClientService notificacaoService = new NotificacaoClientService();
-
-    //COMPONENTES DE UI - LOCAIS
+    private final InscricaoService inscricaoService = new InscricaoService();
+    private final CertificadoClientService certificadoService = new CertificadoClientService();
 
     @FXML
     private TableView<LocalDTO> tblLocais;
@@ -47,8 +45,6 @@ public class GestorController implements Initializable {
     @FXML
     private TableColumn<LocalDTO, String> colLocalMorada;
 
-    //COMPONENTES DE UI - ESTATÍSTICAS
-
     @FXML
     private ComboBox<EventoDTO> cmbEventos;
     @FXML
@@ -56,14 +52,22 @@ public class GestorController implements Initializable {
     @FXML
     private Label lblTotalInscricoes, lblInscricoesAtivas, lblCheckIns, lblVagas, lblOcupacao;
 
-    //COMPONENTES DE UI - ANÚNCIOS
-
     @FXML
     private TextArea txtAnuncio;
     @FXML
     private Label lblResultadoAnuncio;
-
-    //COMPONENTES DE UI - EVENTOS
+    @FXML
+    private DatePicker dpDataInicio;
+    @FXML
+    private DatePicker dpDataFim;
+    @FXML
+    private Spinner<Integer> spHoraInicio;
+    @FXML
+    private Spinner<Integer> spMinutoInicio;
+    @FXML
+    private Spinner<Integer> spHoraFim;
+    @FXML
+    private Spinner<Integer> spMinutoFim;
 
     @FXML
     private TableView<EventoDTO> tblEventos;
@@ -76,32 +80,78 @@ public class GestorController implements Initializable {
     @FXML
     private TableColumn<EventoDTO, Void> colEventoAcoes;
 
+    @FXML
+    private TextField txtTokenCheckin;
+    @FXML
+    private Button btnValidarCheckin;
+    @FXML
+    private Label lblResultadoCheckin;
+
+    @FXML
+    private TableView<NotificacaoDTO> tblAnuncios;
+    @FXML
+    private TableColumn<NotificacaoDTO, String> colAnuncioConteudo;
+    @FXML
+    private TableColumn<NotificacaoDTO, String> colAnuncioInicio;
+    @FXML
+    private TableColumn<NotificacaoDTO, String> colAnuncioFim;
+    @FXML
+    private TableColumn<NotificacaoDTO, Void> colAnuncioAcoes;
+
+    // Certificados
+    @FXML
+    private ComboBox<EventoDTO> cmbEventosCert;
+    @FXML
+    private Label lblResultadoCertificados;
+    @FXML
+    private TableView<CertificadoDTO> tblCertificados;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertUtilizador;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertEvento;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertTipo;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertData;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertCodigo;
+
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    /**
-     * Inicializa o controlador após o carregamento do FXML.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupLocaisTable();
         setupEventosTable();
+        setupAnunciosTable();
+        setupCertificadosTable();
+        setupSpinners();
         carregarLocais();
         carregarEventos();
         carregarComboEventos();
+        carregarAnuncios();
     }
 
-    /**
-     * Configura a tabela de locais.
-     */
+    private void setupSpinners() {
+        if (spHoraInicio != null) {
+            spHoraInicio.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 0));
+        }
+        if (spMinutoInicio != null) {
+            spMinutoInicio.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0, 15));
+        }
+        if (spHoraFim != null) {
+            spHoraFim.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 23));
+        }
+        if (spMinutoFim != null) {
+            spMinutoFim.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 59, 15));
+        }
+    }
+
     private void setupLocaisTable() {
         colLocalNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colLocalCapacidade.setCellValueFactory(new PropertyValueFactory<>("capacidade"));
         colLocalMorada.setCellValueFactory(new PropertyValueFactory<>("morada"));
     }
 
-    /**
-     * Configura a tabela de eventos com ações.
-     */
     private void setupEventosTable() {
         colEventoTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colEventoData.setCellValueFactory(c -> new SimpleStringProperty(
@@ -109,17 +159,35 @@ public class GestorController implements Initializable {
         colEventoEstado.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getEstado() != null ? c.getValue().getEstado().toString() : ""));
 
-        // Se a coluna de ações existir, configurar
         if (colEventoAcoes != null) {
             colEventoAcoes.setCellFactory(col -> new TableCell<>() {
                 private final Button btnEditar = new Button("✏️");
                 private final Button btnApagar = new Button("🗑️");
-                private final HBox hbox = new HBox(5, btnEditar, btnApagar);
+                private final MenuButton btnEstado = new MenuButton("📋");
+                private final HBox hbox = new HBox(5, btnEditar, btnEstado, btnApagar);
 
                 {
                     btnEditar.getStyleClass().add("btn-icon");
                     btnApagar.getStyleClass().add("btn-icon");
+                    btnEstado.getStyleClass().add("btn-icon");
                     btnApagar.setStyle("-fx-text-fill: #ef4444;");
+                    btnEstado.setTooltip(new Tooltip("Alterar estado"));
+
+                    MenuItem itemRascunho = new MenuItem("📝 Rascunho");
+                    MenuItem itemPublicar = new MenuItem("🟢 Publicar");
+                    MenuItem itemCancelar = new MenuItem("🔴 Cancelar");
+                    MenuItem itemConcluir = new MenuItem("✅ Concluir");
+
+                    itemRascunho.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                            gestaoeventos.entity.EstadoEvento.RASCUNHO));
+                    itemPublicar.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                            gestaoeventos.entity.EstadoEvento.PUBLICADO));
+                    itemCancelar.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                            gestaoeventos.entity.EstadoEvento.CANCELADO));
+                    itemConcluir.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                            gestaoeventos.entity.EstadoEvento.CONCLUIDO));
+
+                    btnEstado.getItems().addAll(itemRascunho, itemPublicar, itemCancelar, itemConcluir);
 
                     btnEditar.setOnAction(e -> editarEvento(getTableView().getItems().get(getIndex())));
                     btnApagar.setOnAction(e -> apagarEvento(getTableView().getItems().get(getIndex())));
@@ -134,9 +202,263 @@ public class GestorController implements Initializable {
         }
     }
 
-    /**
-     * Carrega a lista de locais disponíveis.
-     */
+    private void setupAnunciosTable() {
+        if (colAnuncioConteudo != null) {
+            colAnuncioConteudo.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getConteudo() != null ? (c.getValue().getConteudo().length() > 50
+                            ? c.getValue().getConteudo().substring(0, 50) + "..."
+                            : c.getValue().getConteudo()) : ""));
+        }
+        if (colAnuncioInicio != null) {
+            colAnuncioInicio.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getDataInicioExibicao() != null ? c.getValue().getDataInicioExibicao().format(DTF)
+                            : "Imediato"));
+        }
+        if (colAnuncioFim != null) {
+            colAnuncioFim.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getDataFimExibicao() != null ? c.getValue().getDataFimExibicao().format(DTF)
+                            : "Indefinido"));
+        }
+
+        if (colAnuncioAcoes != null) {
+            colAnuncioAcoes.setCellFactory(col -> new TableCell<>() {
+                private final Button btnEditar = new Button("Editar");
+                private final Button btnApagar = new Button("Apagar");
+                private final HBox hbox = new HBox(5, btnEditar, btnApagar);
+
+                {
+                    btnEditar.getStyleClass().add("btn-secondary");
+                    btnEditar.setStyle("-fx-font-size: 11px; -fx-padding: 3 8;");
+                    btnApagar.getStyleClass().add("btn-secondary");
+                    btnApagar.setStyle("-fx-font-size: 11px; -fx-padding: 3 8; -fx-text-fill: #ef4444;");
+
+                    btnEditar.setOnAction(e -> editarAnuncio(getTableView().getItems().get(getIndex())));
+                    btnApagar.setOnAction(e -> apagarAnuncio(getTableView().getItems().get(getIndex())));
+                }
+
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setGraphic(empty ? null : hbox);
+                }
+            });
+        }
+    }
+
+    private void setupCertificadosTable() {
+        // Configurar combo de eventos para certificados
+        if (cmbEventosCert != null) {
+            try {
+                List<EventoDTO> eventos = eventoService.listarTodos();
+                cmbEventosCert.setItems(FXCollections.observableArrayList(eventos));
+                cmbEventosCert.setConverter(new javafx.util.StringConverter<>() {
+                    @Override
+                    public String toString(EventoDTO e) {
+                        return e != null ? e.getTitulo() : "";
+                    }
+
+                    @Override
+                    public EventoDTO fromString(String s) {
+                        return null;
+                    }
+                });
+
+                // Ao selecionar evento, carregar certificados
+                cmbEventosCert.valueProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null) {
+                        carregarCertificadosEvento(newVal.getId());
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao configurar combo certificados: " + e.getMessage());
+            }
+        }
+
+        // Configurar colunas da tabela
+        if (colCertUtilizador != null) {
+            colCertUtilizador.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getUtilizadorNome() != null ? c.getValue().getUtilizadorNome()
+                            : "User #" + c.getValue().getUtilizadorNumero()));
+        }
+        if (colCertEvento != null) {
+            colCertEvento.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getEventoTitulo() != null ? c.getValue().getEventoTitulo() : ""));
+        }
+        if (colCertTipo != null) {
+            colCertTipo.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getTipoDescricao() != null ? c.getValue().getTipoDescricao()
+                            : (c.getValue().getTipo() != null ? c.getValue().getTipo().getDescricao() : "Presenca")));
+        }
+        if (colCertData != null) {
+            colCertData.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getDataEmissao() != null ? c.getValue().getDataEmissao().format(DTF) : ""));
+        }
+        if (colCertCodigo != null) {
+            colCertCodigo.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getCodigoVerificacao() != null ? c.getValue().getCodigoVerificacao() : ""));
+        }
+    }
+
+    private void carregarCertificadosEvento(Integer eventoId) {
+        if (tblCertificados == null)
+            return;
+        try {
+            List<CertificadoDTO> certs = certificadoService.listarPorEvento(eventoId);
+            tblCertificados.setItems(FXCollections.observableArrayList(certs));
+        } catch (Exception e) {
+            mostrarErro("Erro ao carregar certificados: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void emitirCertificadosEmMassa() {
+        EventoDTO selected = cmbEventosCert != null ? cmbEventosCert.getValue() : null;
+        if (selected == null) {
+            mostrarAviso("Selecione um evento.");
+            return;
+        }
+        if (!UserSession.getInstance().isLoggedIn())
+            return;
+
+        try {
+            Integer emitidoPor = UserSession.getInstance().getUser().getNumero();
+            // Gestor emite certificado tipo ORGANIZADOR
+            String resultado = certificadoService.emitirEmMassaComTipo(
+                    selected.getId(), emitidoPor, gestaoeventos.entity.TipoCertificado.ORGANIZADOR);
+
+            if (lblResultadoCertificados != null) {
+                lblResultadoCertificados.setText(resultado);
+            }
+            mostrarSucesso("Certificados de Organizador emitidos!");
+            carregarCertificadosEvento(selected.getId());
+        } catch (Exception e) {
+            mostrarErro("Erro ao emitir certificados: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void carregarAnuncios() {
+        if (tblAnuncios == null)
+            return;
+        try {
+            List<NotificacaoDTO> anuncios = notificacaoService.listarTodosAnuncios();
+            tblAnuncios.setItems(FXCollections.observableArrayList(anuncios));
+        } catch (Exception e) {
+            mostrarErro("Erro ao carregar anuncios: " + e.getMessage());
+        }
+    }
+
+    private void editarAnuncio(NotificacaoDTO anuncio) {
+        Dialog<NotificacaoDTO> dialog = new Dialog<>();
+        dialog.setTitle("Editar Anuncio");
+        dialog.setHeaderText("Editar conteudo e periodo de exibicao");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
+
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
+
+        TextArea txtConteudo = new TextArea(anuncio.getConteudo());
+        txtConteudo.setPrefRowCount(3);
+        txtConteudo.setPrefWidth(400);
+
+        DatePicker dpInicio = new DatePicker();
+        if (anuncio.getDataInicioExibicao() != null) {
+            dpInicio.setValue(anuncio.getDataInicioExibicao().toLocalDate());
+        }
+
+        DatePicker dpFim = new DatePicker();
+        if (anuncio.getDataFimExibicao() != null) {
+            dpFim.setValue(anuncio.getDataFimExibicao().toLocalDate());
+        }
+
+        Spinner<Integer> spHora1 = new Spinner<>(0, 23,
+                anuncio.getDataInicioExibicao() != null ? anuncio.getDataInicioExibicao().getHour() : 0);
+        Spinner<Integer> spMin1 = new Spinner<>(0, 59,
+                anuncio.getDataInicioExibicao() != null ? anuncio.getDataInicioExibicao().getMinute() : 0);
+        Spinner<Integer> spHora2 = new Spinner<>(0, 23,
+                anuncio.getDataFimExibicao() != null ? anuncio.getDataFimExibicao().getHour() : 23);
+        Spinner<Integer> spMin2 = new Spinner<>(0, 59,
+                anuncio.getDataFimExibicao() != null ? anuncio.getDataFimExibicao().getMinute() : 59);
+
+        spHora1.setPrefWidth(60);
+        spMin1.setPrefWidth(60);
+        spHora2.setPrefWidth(60);
+        spMin2.setPrefWidth(60);
+
+        grid.add(new Label("Conteudo:"), 0, 0);
+        grid.add(txtConteudo, 1, 0, 3, 1);
+        grid.add(new Label("Data Inicio:"), 0, 1);
+        grid.add(dpInicio, 1, 1);
+        grid.add(spHora1, 2, 1);
+        grid.add(spMin1, 3, 1);
+        grid.add(new Label("Data Fim:"), 0, 2);
+        grid.add(dpFim, 1, 2);
+        grid.add(spHora2, 2, 2);
+        grid.add(spMin2, 3, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == btnGuardar) {
+                String conteudo = txtConteudo.getText();
+                if (conteudo == null || conteudo.isBlank()) {
+                    return null;
+                }
+
+                LocalDateTime dataInicio = null;
+                LocalDateTime dataFim = null;
+
+                if (dpInicio.getValue() != null) {
+                    dataInicio = LocalDateTime.of(dpInicio.getValue(),
+                            LocalTime.of(spHora1.getValue(), spMin1.getValue()));
+                }
+                if (dpFim.getValue() != null) {
+                    dataFim = LocalDateTime.of(dpFim.getValue(),
+                            LocalTime.of(spHora2.getValue(), spMin2.getValue()));
+                }
+
+                NotificacaoDTO dto = notificacaoService.atualizarAnuncio(
+                        anuncio.getId(), conteudo, dataInicio, dataFim);
+                return dto;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(dto -> {
+            if (dto != null) {
+                mostrarSucesso("Anuncio atualizado com sucesso!");
+                carregarAnuncios();
+            } else {
+                mostrarErro("Falha ao atualizar o anuncio.");
+            }
+        });
+    }
+
+    private void apagarAnuncio(NotificacaoDTO anuncio) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Eliminacao");
+        confirm.setHeaderText("Apagar anuncio");
+        confirm.setContentText("Tem a certeza que pretende apagar este anuncio?\n\n" +
+                (anuncio.getConteudo().length() > 100 ? anuncio.getConteudo().substring(0, 100) + "..."
+                        : anuncio.getConteudo()));
+
+        confirm.showAndWait().filter(r -> r == ButtonType.OK).ifPresent(r -> {
+            if (notificacaoService.apagarAnuncio(anuncio.getId())) {
+                mostrarSucesso("Anuncio eliminado com sucesso!");
+                carregarAnuncios();
+            } else {
+                mostrarErro("Falha ao eliminar o anuncio.");
+            }
+        });
+    }
+
     @FXML
     public void carregarLocais() {
         try {
@@ -147,22 +469,99 @@ public class GestorController implements Initializable {
         }
     }
 
-    /**
-     * Informa que novos locais devem ser criados pelo Admin.
-     */
     @FXML
     public void novoLocal() {
-        mostrarInfo("Para criar novos locais, utilize o painel Admin.");
+        Dialog<LocalCreateDTO> dialog = createLocalDialog(null);
+        dialog.showAndWait().ifPresent(dto -> {
+            LocalDTO created = localService.criar(dto);
+            if (created != null) {
+                mostrarSucesso("Local '" + created.getNome() + "' criado com sucesso!");
+                carregarLocais();
+            } else {
+                mostrarErro("Falha ao criar o local. Verifique os dados.");
+            }
+        });
     }
 
-    /**
-     * Carrega os eventos criados pelo gestor atual.
-     */
+    private Dialog<LocalCreateDTO> createLocalDialog(LocalDTO existing) {
+        Dialog<LocalCreateDTO> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Novo Local" : "Editar Local");
+        dialog.setHeaderText(existing == null ? "Preencha os dados do novo local" : "Altere os dados do local");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
+
+        TextField tfNome = new TextField();
+        tfNome.setPromptText("Nome do local (ex: Auditório Principal)");
+        TextField tfCapacidade = new TextField();
+        tfCapacidade.setPromptText("Capacidade máxima (ex: 200)");
+        TextField tfMorada = new TextField();
+        tfMorada.setPromptText("Morada completa");
+
+        if (existing != null) {
+            tfNome.setText(existing.getNome());
+            tfCapacidade.setText(String.valueOf(existing.getCapacidade()));
+            tfMorada.setText(existing.getMorada());
+        }
+
+        GridPane grid = new GridPane();
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
+
+        grid.add(new Label("Nome:"), 0, 0);
+        grid.add(tfNome, 1, 0);
+        grid.add(new Label("Capacidade:"), 0, 1);
+        grid.add(tfCapacidade, 1, 1);
+        grid.add(new Label("Morada:"), 0, 2);
+        grid.add(tfMorada, 1, 2);
+
+        // Expandir campos
+        tfNome.setPrefWidth(300);
+        tfCapacidade.setPrefWidth(300);
+        tfMorada.setPrefWidth(300);
+
+        dialogPane.setContent(grid);
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Validação antes de fechar
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            if (tfNome.getText().isBlank()) {
+                mostrarAviso("O nome do local é obrigatório.");
+                event.consume();
+                return;
+            }
+            try {
+                Integer.parseInt(tfCapacidade.getText());
+            } catch (NumberFormatException e) {
+                mostrarAviso("A capacidade deve ser um número válido.");
+                event.consume();
+            }
+        });
+
+        dialog.setResultConverter(btn -> {
+            if (btn == ButtonType.OK) {
+                try {
+                    LocalCreateDTO dto = new LocalCreateDTO();
+                    dto.setNome(tfNome.getText().trim());
+                    dto.setCapacidade(Integer.parseInt(tfCapacidade.getText().trim()));
+                    dto.setMorada(tfMorada.getText().trim());
+                    return dto;
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
     @FXML
     public void carregarEventos() {
-        if (!UserSession.getInstance().isLoggedIn()) {
+        if (!UserSession.getInstance().isLoggedIn())
             return;
-        }
         try {
             Integer numero = UserSession.getInstance().getUser().getNumero();
             List<EventoDTO> eventos = eventoService.listarPorOrganizador(numero);
@@ -172,9 +571,6 @@ public class GestorController implements Initializable {
         }
     }
 
-    /**
-     * Carrega todos os eventos para o ComboBox de estatísticas.
-     */
     private void carregarComboEventos() {
         try {
             List<EventoDTO> eventos = eventoService.listarTodos();
@@ -195,10 +591,6 @@ public class GestorController implements Initializable {
         }
     }
 
-    /**
-     * Abre o diálogo para criar um novo evento.
-     * O gestor pode criar eventos e será o organizador do mesmo.
-     */
     @FXML
     public void criarEvento() {
         if (!UserSession.getInstance().isLoggedIn()) {
@@ -207,7 +599,6 @@ public class GestorController implements Initializable {
         }
 
         try {
-            // Carregar locais disponíveis
             List<LocalDTO> locais = localService.listarTodos();
             if (locais.isEmpty()) {
                 mostrarAviso("Não existem locais disponíveis. Contacte o administrador.");
@@ -215,8 +606,6 @@ public class GestorController implements Initializable {
             }
 
             Integer criadorNumero = UserSession.getInstance().getUser().getNumero();
-
-            // Mostrar diálogo de criação
             Optional<EventoCreateDTO> resultado = EventoDialogHelper.mostrarDialogoCriarEvento(locais, criadorNumero);
 
             resultado.ifPresent(dto -> {
@@ -234,16 +623,70 @@ public class GestorController implements Initializable {
         }
     }
 
-    /**
-     * Abre o diálogo para editar um evento existente.
-     */
     private void editarEvento(EventoDTO evento) {
-        mostrarInfo("Funcionalidade de editar evento em desenvolvimento.");
+        if (!UserSession.getInstance().isLoggedIn())
+            return;
+
+        try {
+            List<LocalDTO> locais = localService.listarTodos();
+            Integer gestorNumero = UserSession.getInstance().getUser().getNumero();
+
+            Optional<EventoCreateDTO> resultado = EventoDialogHelper.mostrarDialogoEditarEvento(
+                    evento, locais, gestorNumero);
+
+            resultado.ifPresent(dto -> {
+                EventoDTO atualizado = eventoService.atualizar(evento.getId(), dto);
+                if (atualizado != null) {
+                    mostrarSucesso("Evento '" + atualizado.getTitulo() + "' atualizado com sucesso!");
+                    carregarEventos();
+                    carregarComboEventos();
+                } else {
+                    mostrarErro("Falha ao atualizar o evento.");
+                }
+            });
+        } catch (Exception e) {
+            mostrarErro("Erro ao editar evento: " + e.getMessage());
+        }
     }
 
-    /**
-     * Apaga um evento após confirmação.
-     */
+    private void alterarEstadoEvento(EventoDTO evento, gestaoeventos.entity.EstadoEvento novoEstado) {
+        if (evento.getEstado() == novoEstado) {
+            mostrarInfo("O evento já está no estado " + novoEstado + ".");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Alteração de Estado");
+        confirm.setHeaderText("Alterar estado do evento: " + evento.getTitulo());
+        confirm.setContentText("O estado atual é " + evento.getEstado() + ". Deseja alterar para " + novoEstado + "?");
+
+        confirm.showAndWait().filter(r -> r == ButtonType.OK).ifPresent(r -> {
+            try {
+                EventoCreateDTO dto = new EventoCreateDTO();
+                dto.setTitulo(evento.getTitulo());
+                dto.setDescricao(evento.getDescricao());
+                dto.setDataInicio(evento.getDataInicio());
+                dto.setDataFim(evento.getDataFim());
+                dto.setTipo(evento.getTipo());
+                dto.setMaxParticipantes(evento.getMaxParticipantes());
+                dto.setLocalId(evento.getLocalId());
+                dto.setCriadorNumero(evento.getCriadorNumero());
+                dto.setEstado(novoEstado);
+
+                EventoDTO atualizado = eventoService.atualizar(evento.getId(), dto);
+                if (atualizado != null) {
+                    mostrarSucesso("Estado alterado para " + novoEstado + " com sucesso!");
+                    carregarEventos();
+                    carregarComboEventos();
+                } else {
+                    mostrarErro("Falha ao alterar o estado do evento.");
+                }
+            } catch (Exception e) {
+                mostrarErro("Erro ao alterar estado: " + e.getMessage());
+            }
+        });
+    }
+
     private void apagarEvento(EventoDTO evento) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmar Eliminação");
@@ -261,9 +704,6 @@ public class GestorController implements Initializable {
         });
     }
 
-    /**
-     * Carrega e exibe estatísticas do evento selecionado.
-     */
     @FXML
     public void verEstatisticas() {
         EventoDTO selected = cmbEventos.getValue();
@@ -291,9 +731,6 @@ public class GestorController implements Initializable {
         }
     }
 
-    /**
-     * Envia um anúncio para todos os utilizadores.
-     */
     @FXML
     public void enviarAnuncio() {
         String conteudo = txtAnuncio.getText();
@@ -302,22 +739,87 @@ public class GestorController implements Initializable {
             return;
         }
 
-        if (!UserSession.getInstance().isLoggedIn()) {
+        if (!UserSession.getInstance().isLoggedIn())
             return;
-        }
 
         try {
             Integer autorNumero = UserSession.getInstance().getUser().getNumero();
-            String resultado = notificacaoService.enviarAnuncioBroadcast(conteudo, autorNumero);
+
+            LocalDateTime dataInicio = null;
+            LocalDateTime dataFim = null;
+
+            if (dpDataInicio != null && dpDataInicio.getValue() != null) {
+                int hora = spHoraInicio != null ? spHoraInicio.getValue() : 0;
+                int minuto = spMinutoInicio != null ? spMinutoInicio.getValue() : 0;
+                dataInicio = LocalDateTime.of(dpDataInicio.getValue(), LocalTime.of(hora, minuto));
+            }
+
+            if (dpDataFim != null && dpDataFim.getValue() != null) {
+                int hora = spHoraFim != null ? spHoraFim.getValue() : 23;
+                int minuto = spMinutoFim != null ? spMinutoFim.getValue() : 59;
+                dataFim = LocalDateTime.of(dpDataFim.getValue(), LocalTime.of(hora, minuto));
+            }
+
+            String resultado = notificacaoService.enviarAnuncioBroadcast(conteudo, autorNumero, dataInicio, dataFim);
             lblResultadoAnuncio.setText(resultado);
             txtAnuncio.clear();
+
+            if (dpDataInicio != null)
+                dpDataInicio.setValue(null);
+            if (dpDataFim != null)
+                dpDataFim.setValue(null);
+
             mostrarSucesso("Anúncio enviado com sucesso!");
         } catch (Exception e) {
             mostrarErro("Erro ao enviar anúncio: " + e.getMessage());
         }
     }
 
-    //MÉTODOS DE NOTIFICAÇÃO
+    @FXML
+    void handleValidarCheckin() {
+        if (txtTokenCheckin == null)
+            return;
+
+        String token = txtTokenCheckin.getText().trim();
+        if (token.isEmpty()) {
+            lblResultadoCheckin.setText("Por favor introduza o código do QR.");
+            lblResultadoCheckin.setStyle("-fx-text-fill: #ef4444;");
+            return;
+        }
+
+        btnValidarCheckin.setDisable(true);
+        lblResultadoCheckin.setText("A validar...");
+        lblResultadoCheckin.setStyle("-fx-text-fill: #9CA3AF;");
+
+        Task<InscricaoDTO> task = new Task<>() {
+            @Override
+            protected InscricaoDTO call() throws Exception {
+                return inscricaoService.checkinPorQrCode(token);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            InscricaoDTO dto = task.getValue();
+            if (dto != null) {
+                lblResultadoCheckin.setText("✅ Check-in confirmado com sucesso!\nInscrição #" + dto.getId());
+                lblResultadoCheckin.setStyle("-fx-text-fill: #22c55e;");
+                txtTokenCheckin.clear();
+                mostrarSucesso("Check-in validado com sucesso!");
+            } else {
+                lblResultadoCheckin.setText("❌ Token inválido ou já utilizado.");
+                lblResultadoCheckin.setStyle("-fx-text-fill: #ef4444;");
+            }
+            btnValidarCheckin.setDisable(false);
+        });
+
+        task.setOnFailed(e -> {
+            lblResultadoCheckin.setText("❌ Erro: " + task.getException().getMessage());
+            lblResultadoCheckin.setStyle("-fx-text-fill: #ef4444;");
+            btnValidarCheckin.setDisable(false);
+        });
+
+        new Thread(task).start();
+    }
 
     private Window getWindow() {
         return tblLocais.getScene() != null ? tblLocais.getScene().getWindow() : null;
@@ -325,29 +827,25 @@ public class GestorController implements Initializable {
 
     private void mostrarSucesso(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.sucesso(window, mensagem);
-        }
     }
 
     private void mostrarErro(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.erro(window, mensagem);
-        }
     }
 
     private void mostrarAviso(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.aviso(window, mensagem);
-        }
     }
 
     private void mostrarInfo(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.info(window, mensagem);
-        }
     }
 }

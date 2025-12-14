@@ -3,7 +3,6 @@ package gestaoeventos.client.controller;
 import gestaoeventos.client.model.UserSession;
 import gestaoeventos.client.service.InscricaoService;
 import gestaoeventos.dto.InscricaoDTO;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -17,10 +16,14 @@ import java.util.ResourceBundle;
 
 public class InscricoesController implements Initializable {
 
-    @FXML private TableView<InscricaoDTO> tabelaInscricoes;
-    @FXML private TableColumn<InscricaoDTO, String> colEvento, colData, colEstado, colCheckIn;
-    @FXML private Button btnCancelar;
-    @FXML private Label lblStatus;
+    @FXML
+    private TableView<InscricaoDTO> tabelaInscricoes;
+    @FXML
+    private TableColumn<InscricaoDTO, String> colEvento, colData, colEstado, colCheckIn, colToken;
+    @FXML
+    private Button btnCancelar;
+    @FXML
+    private Label lblStatus;
 
     private final InscricaoService inscricaoService = new InscricaoService();
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -31,18 +34,44 @@ public class InscricoesController implements Initializable {
         carregarInscricoes();
 
         tabelaInscricoes.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            // Só ativa cancelar se a inscrição estiver ATIVA ou em LISTA_ESPERA
-            boolean podeCancelar = newVal != null && 
-                ("ATIVA".equals(newVal.getEstado().toString()) || "LISTA_ESPERA".equals(newVal.getEstado().toString()));
+            // So ativa cancelar se a inscricao estiver ATIVA ou em LISTA_ESPERA
+            boolean podeCancelar = newVal != null &&
+                    ("ATIVA".equals(newVal.getEstado().toString())
+                            || "LISTA_ESPERA".equals(newVal.getEstado().toString()));
             btnCancelar.setDisable(!podeCancelar);
         });
     }
 
     private void setupTable() {
-        colEvento.setCellValueFactory(cell -> new SimpleStringProperty("Evento #" + cell.getValue().getEventoId()));
-        colData.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDataInscricao().format(dtf)));
-        colEstado.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getEstado().toString()));
-        colCheckIn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().isCheckIn() ? "Sim" : "Não"));
+        // Mostrar nome do evento em vez de "Evento #ID"
+        colEvento.setCellValueFactory(cell -> new SimpleStringProperty(
+                cell.getValue().getEventoTitulo() != null ? cell.getValue().getEventoTitulo()
+                        : "Evento #" + cell.getValue().getEventoId()));
+
+        colData.setCellValueFactory(cell -> new SimpleStringProperty(
+                cell.getValue().getDataInscricao() != null ? cell.getValue().getDataInscricao().format(dtf) : ""));
+
+        colEstado.setCellValueFactory(cell -> new SimpleStringProperty(
+                cell.getValue().getEstado() != null ? cell.getValue().getEstado().toString() : ""));
+
+        colCheckIn.setCellValueFactory(cell -> new SimpleStringProperty(
+                cell.getValue().isCheckIn() ? "Sim" : "Nao"));
+
+        // Mostrar token apenas para inscricoes ativas sem check-in
+        if (colToken != null) {
+            colToken.setCellValueFactory(cell -> {
+                InscricaoDTO dto = cell.getValue();
+                if (dto.getQrCodeToken() != null && !dto.getQrCodeToken().isEmpty()) {
+                    return new SimpleStringProperty(dto.getQrCodeToken());
+                } else if (dto.isCheckIn()) {
+                    return new SimpleStringProperty("Check-in feito");
+                } else if ("ATIVA".equals(dto.getEstado().toString())) {
+                    return new SimpleStringProperty("A gerar...");
+                } else {
+                    return new SimpleStringProperty("-");
+                }
+            });
+        }
     }
 
     @FXML
@@ -63,26 +92,26 @@ public class InscricoesController implements Initializable {
     @FXML
     void handleCancelar() {
         InscricaoDTO dto = tabelaInscricoes.getSelectionModel().getSelectedItem();
-        if (dto == null) return;
+        if (dto == null)
+            return;
 
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                // Assumindo que criaste o método cancelar no InscricaoService
-                 inscricaoService.cancelar(dto.getId()); 
-                 return null;
+                inscricaoService.cancelar(dto.getId());
+                return null;
             }
         };
 
         task.setOnSucceeded(e -> {
-            showFeedback("Inscrição cancelada.", false);
-            carregarInscricoes(); // Recarrega a lista após o cancelamento
+            showFeedback("Inscricao cancelada.", false);
+            carregarInscricoes();
         });
-        
+
         task.setOnFailed(e -> showFeedback("Erro ao cancelar: " + task.getException().getMessage(), true));
         new Thread(task).start();
     }
-    
+
     private void showFeedback(String msg, boolean isError) {
         lblStatus.setText(msg);
         lblStatus.setStyle(isError ? "-fx-text-fill: #ef4444;" : "-fx-text-fill: #22c55e;");

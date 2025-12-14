@@ -20,8 +20,8 @@ public class InscricaoService {
     private final QrCodeService qrCodeService;
 
     public InscricaoService(InscricaoRepository inscricaoRepository,
-                            EventoService eventoService,
-                            QrCodeService qrCodeService) {
+            EventoService eventoService,
+            QrCodeService qrCodeService) {
         this.inscricaoRepository = inscricaoRepository;
         this.eventoService = eventoService;
         this.qrCodeService = qrCodeService;
@@ -141,11 +141,18 @@ public class InscricaoService {
         InscricaoDTO dto = new InscricaoDTO();
         dto.setId(i.getId());
         dto.setEventoId(i.getEvento() != null ? i.getEvento().getId() : null);
+        dto.setEventoTitulo(i.getEvento() != null ? i.getEvento().getTitulo() : null);
         dto.setUtilizadorNumero(i.getUtilizador() != null ? i.getUtilizador().getNumero() : null);
         dto.setDataInscricao(i.getDataInscricao());
         dto.setEstado(i.getEstado());
         dto.setCheckIn(i.isCheckIn());
         dto.setDataCheckin(i.getDataCheckin());
+
+        // Incluir token QR apenas para inscricoes ativas que ainda nao fizeram check-in
+        if (i.getEstado() == EstadoInscricao.ATIVA && !i.isCheckIn() && i.getQrCodeCheckin() != null) {
+            dto.setQrCodeToken(i.getQrCodeCheckin());
+        }
+
         return dto;
     }
 }

@@ -17,11 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Classe utilitária para criar diálogos modais de criação/edição de eventos.
- * 
- * Fornece um diálogo moderno e estilizado para recolher todos os dados
- * necessários para criar um novo evento no sistema.
- * 
+ * Classe utilitária para diálogos de criação e edição de eventos.
  */
 public class EventoDialogHelper {
 
@@ -35,31 +31,24 @@ public class EventoDialogHelper {
         dialog.setTitle("Criar Novo Evento");
         dialog.setHeaderText("Preencha os dados do evento");
 
-        // Aplicar estilo ao diálogo
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getStylesheets().add(
                 EventoDialogHelper.class.getResource("/css/app-theme.css").toExternalForm());
-        dialogPane.setStyle("-fx-background-color: #1E1E1E;");
 
-        // Botões
         ButtonType btnCriar = new ButtonType("Criar Evento", ButtonBar.ButtonData.OK_DONE);
         dialogPane.getButtonTypes().addAll(btnCriar, ButtonType.CANCEL);
 
-        // Estilizar botão Criar
         Button criarButton = (Button) dialogPane.lookupButton(btnCriar);
         criarButton.getStyleClass().add("btn-primary");
 
         TextField tfTitulo = new TextField();
         tfTitulo.setPromptText("Ex: Workshop de JavaFX");
-        tfTitulo.setStyle("-fx-background-color: #2A2A2A; -fx-text-fill: white; -fx-prompt-text-fill: #6B7280;");
 
         TextArea taDescricao = new TextArea();
         taDescricao.setPromptText("Descrição detalhada do evento...");
         taDescricao.setPrefRowCount(3);
-        taDescricao.setStyle("-fx-background-color: #2A2A2A; -fx-text-fill: white; -fx-prompt-text-fill: #6B7280;");
 
         DatePicker dpDataInicio = new DatePicker(LocalDate.now().plusDays(7));
-        dpDataInicio.setStyle("-fx-background-color: #2A2A2A;");
 
         Spinner<Integer> spHoraInicio = new Spinner<>(0, 23, 9);
         spHoraInicio.setEditable(true);
@@ -70,7 +59,6 @@ public class EventoDialogHelper {
         spMinutoInicio.setPrefWidth(70);
 
         DatePicker dpDataFim = new DatePicker(LocalDate.now().plusDays(7));
-        dpDataFim.setStyle("-fx-background-color: #2A2A2A;");
 
         Spinner<Integer> spHoraFim = new Spinner<>(0, 23, 17);
         spHoraFim.setEditable(true);
@@ -101,7 +89,6 @@ public class EventoDialogHelper {
 
         TextField tfAreaTematica = new TextField();
         tfAreaTematica.setPromptText("Ex: Programação, Web, IA...");
-        tfAreaTematica.setStyle("-fx-background-color: #2A2A2A; -fx-text-fill: white; -fx-prompt-text-fill: #6B7280;");
 
         ComboBox<LocalDTO> cbLocal = new ComboBox<>(
                 FXCollections.observableArrayList(locais));
@@ -118,13 +105,11 @@ public class EventoDialogHelper {
             }
         });
 
-        // Layout do formulário
         GridPane grid = new GridPane();
         grid.setHgap(15);
         grid.setVgap(12);
         grid.setPadding(new Insets(20));
 
-        // Labels
         String labelStyle = "-fx-text-fill: #E0E0E0; -fx-font-weight: bold;";
 
         int row = 0;
@@ -152,18 +137,15 @@ public class EventoDialogHelper {
         grid.add(createLabel("Local *", labelStyle), 0, row);
         grid.add(cbLocal, 1, row++);
 
-        // Scroll
         ScrollPane scrollPane = new ScrollPane(grid);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background: #1E1E1E; -fx-background-color: #1E1E1E;");
+
         scrollPane.setPrefHeight(450);
 
         dialogPane.setContent(scrollPane);
 
-        // Validação e conversão do resultado
         dialog.setResultConverter(buttonType -> {
             if (buttonType == btnCriar) {
-                // Validação 
                 if (tfTitulo.getText().isBlank()) {
                     return null;
                 }
@@ -201,18 +183,12 @@ public class EventoDialogHelper {
         return dialog.showAndWait();
     }
 
-    /**
-     * Cria um Label
-     */
     private static Label createLabel(String text, String style) {
         Label label = new Label(text);
         label.setStyle(style);
         return label;
     }
 
-    /**
-     * Cria um HBox com DatePicker e Spinners
-     */
     private static javafx.scene.layout.HBox createDateTimeBox(
             DatePicker dp, Spinner<Integer> hora, Spinner<Integer> minuto) {
 
@@ -224,9 +200,6 @@ public class EventoDialogHelper {
         return box;
     }
 
-    /**
-     * Formata o tipo de evento
-     */
     private static String formatTipo(TipoEvento tipo) {
         return switch (tipo) {
             case PALESTRA -> "📢 Palestra";
@@ -234,5 +207,177 @@ public class EventoDialogHelper {
             case SEMINARIO -> "📚 Seminário";
             case OUTRO -> "📋 Outro";
         };
+    }
+
+    /**
+     * Mostra um diálogo para editar um evento existente.
+     */
+    public static Optional<EventoCreateDTO> mostrarDialogoEditarEvento(
+            gestaoeventos.dto.EventoDTO evento, List<LocalDTO> locais, Integer gestorNumero) {
+
+        Dialog<EventoCreateDTO> dialog = new Dialog<>();
+        dialog.setTitle("Editar Evento");
+        dialog.setHeaderText("Altere os dados do evento");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(
+                EventoDialogHelper.class.getResource("/css/app-theme.css").toExternalForm());
+
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+
+        Button guardarButton = (Button) dialogPane.lookupButton(btnGuardar);
+        guardarButton.getStyleClass().add("btn-primary");
+
+        TextField tfTitulo = new TextField(evento.getTitulo());
+
+        TextArea taDescricao = new TextArea(evento.getDescricao());
+        taDescricao.setPrefRowCount(3);
+
+        LocalDate inicioDate = evento.getDataInicio() != null ? evento.getDataInicio().toLocalDate() : LocalDate.now();
+        LocalTime inicioTime = evento.getDataInicio() != null ? evento.getDataInicio().toLocalTime()
+                : LocalTime.of(9, 0);
+
+        DatePicker dpDataInicio = new DatePicker(inicioDate);
+
+        Spinner<Integer> spHoraInicio = new Spinner<>(0, 23, inicioTime.getHour());
+        spHoraInicio.setEditable(true);
+        spHoraInicio.setPrefWidth(70);
+
+        Spinner<Integer> spMinutoInicio = new Spinner<>(0, 59, inicioTime.getMinute(), 15);
+        spMinutoInicio.setEditable(true);
+        spMinutoInicio.setPrefWidth(70);
+
+        LocalDate fimDate = evento.getDataFim() != null ? evento.getDataFim().toLocalDate() : LocalDate.now();
+        LocalTime fimTime = evento.getDataFim() != null ? evento.getDataFim().toLocalTime() : LocalTime.of(17, 0);
+
+        DatePicker dpDataFim = new DatePicker(fimDate);
+
+        Spinner<Integer> spHoraFim = new Spinner<>(0, 23, fimTime.getHour());
+        spHoraFim.setEditable(true);
+        spHoraFim.setPrefWidth(70);
+
+        Spinner<Integer> spMinutoFim = new Spinner<>(0, 59, fimTime.getMinute(), 15);
+        spMinutoFim.setEditable(true);
+        spMinutoFim.setPrefWidth(70);
+
+        Spinner<Integer> spMaxParticipantes = new Spinner<>(1, 1000,
+                evento.getMaxParticipantes() != null ? evento.getMaxParticipantes() : 50);
+        spMaxParticipantes.setEditable(true);
+        spMaxParticipantes.setPrefWidth(100);
+
+        ComboBox<TipoEvento> cbTipo = new ComboBox<>(
+                FXCollections.observableArrayList(TipoEvento.values()));
+        cbTipo.setValue(evento.getTipo() != null ? evento.getTipo() : TipoEvento.WORKSHOP);
+        cbTipo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(TipoEvento t) {
+                return t != null ? formatTipo(t) : "";
+            }
+
+            @Override
+            public TipoEvento fromString(String s) {
+                return null;
+            }
+        });
+
+        TextField tfAreaTematica = new TextField(evento.getAreaTematica());
+
+        ComboBox<LocalDTO> cbLocal = new ComboBox<>(
+                FXCollections.observableArrayList(locais));
+        cbLocal.setPromptText("Selecione um local...");
+        cbLocal.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(LocalDTO l) {
+                return l != null ? l.getNome() + " (Cap: " + l.getCapacidade() + ")" : "";
+            }
+
+            @Override
+            public LocalDTO fromString(String s) {
+                return null;
+            }
+        });
+
+        locais.stream()
+                .filter(l -> l.getId().equals(evento.getLocalId()))
+                .findFirst()
+                .ifPresent(cbLocal::setValue);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(15);
+        grid.setVgap(12);
+        grid.setPadding(new Insets(20));
+
+        String labelStyle = "-fx-text-fill: #E0E0E0; -fx-font-weight: bold;";
+
+        int row = 0;
+        grid.add(createLabel("Título *", labelStyle), 0, row);
+        grid.add(tfTitulo, 1, row++);
+
+        grid.add(createLabel("Descrição", labelStyle), 0, row);
+        grid.add(taDescricao, 1, row++);
+
+        grid.add(createLabel("Data e Hora de Início *", labelStyle), 0, row);
+        grid.add(createDateTimeBox(dpDataInicio, spHoraInicio, spMinutoInicio), 1, row++);
+
+        grid.add(createLabel("Data e Hora de Fim *", labelStyle), 0, row);
+        grid.add(createDateTimeBox(dpDataFim, spHoraFim, spMinutoFim), 1, row++);
+
+        grid.add(createLabel("Máximo de Participantes", labelStyle), 0, row);
+        grid.add(spMaxParticipantes, 1, row++);
+
+        grid.add(createLabel("Tipo de Evento *", labelStyle), 0, row);
+        grid.add(cbTipo, 1, row++);
+
+        grid.add(createLabel("Área Temática", labelStyle), 0, row);
+        grid.add(tfAreaTematica, 1, row++);
+
+        grid.add(createLabel("Local *", labelStyle), 0, row);
+        grid.add(cbLocal, 1, row++);
+
+        ScrollPane scrollPane = new ScrollPane(grid);
+        scrollPane.setFitToWidth(true);
+
+        scrollPane.setPrefHeight(450);
+
+        dialogPane.setContent(scrollPane);
+
+        dialog.setResultConverter(buttonType -> {
+            if (buttonType == btnGuardar) {
+                if (tfTitulo.getText().isBlank()) {
+                    return null;
+                }
+                if (dpDataInicio.getValue() == null || dpDataFim.getValue() == null) {
+                    return null;
+                }
+                if (cbLocal.getValue() == null) {
+                    return null;
+                }
+
+                EventoCreateDTO dto = new EventoCreateDTO();
+                dto.setTitulo(tfTitulo.getText().trim());
+                dto.setDescricao(taDescricao.getText().trim());
+
+                LocalDateTime inicio = LocalDateTime.of(
+                        dpDataInicio.getValue(),
+                        LocalTime.of(spHoraInicio.getValue(), spMinutoInicio.getValue()));
+                LocalDateTime fim = LocalDateTime.of(
+                        dpDataFim.getValue(),
+                        LocalTime.of(spHoraFim.getValue(), spMinutoFim.getValue()));
+
+                dto.setDataInicio(inicio);
+                dto.setDataFim(fim);
+                dto.setMaxParticipantes(spMaxParticipantes.getValue());
+                dto.setTipo(cbTipo.getValue());
+                dto.setAreaTematica(tfAreaTematica.getText().trim());
+                dto.setLocalId(cbLocal.getValue().getId());
+                dto.setCriadorNumero(gestorNumero);
+
+                return dto;
+            }
+            return null;
+        });
+
+        return dialog.showAndWait();
     }
 }

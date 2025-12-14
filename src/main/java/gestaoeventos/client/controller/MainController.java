@@ -99,7 +99,7 @@ public class MainController implements Initializable {
         node.setManaged(visivel);
     }
 
-    //Navegação Principal
+    // --- Navegação Principal ---
     @FXML
     void navOverview() {
         setActive(btnOverview);
@@ -130,7 +130,7 @@ public class MainController implements Initializable {
         PageNavigator.loadPage("Certificados.fxml");
     }
 
-    //Navegação Staff
+    // --- Navegação Staff ---
     @FXML
     void navCheckIn() {
         setActive(btnCheckIn);
@@ -149,7 +149,7 @@ public class MainController implements Initializable {
         PageNavigator.loadPage("GestorPanel.fxml");
     }
 
-    //Navegação Admin
+    // --- Navegação Admin ---
     @FXML
     void navAdminPanel() {
         setActive(btnAdminPanel);
@@ -168,7 +168,7 @@ public class MainController implements Initializable {
             btn.getStyleClass().add("active");
     }
 
-    //Logout
+    // --- Logout ---
     @FXML
     void logout() {
         UserSession.getInstance().logout();

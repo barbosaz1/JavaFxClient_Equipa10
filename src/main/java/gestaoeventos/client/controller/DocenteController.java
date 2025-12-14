@@ -23,16 +23,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * Controlador para o painel do Docente.
- * 
- * Gere as funcionalidades específicas do perfil Docente:
- * - Criar e gerir eventos próprios
- * - Registar presenças (check-in) nos seus eventos
- * - Emitir certificados de participação (com nível de autoridade superior)
- * - Visualizar estatísticas dos seus eventos
- * 
- * @author Estudante de Engenharia Informática - UPT
- * @version 1.0
+ * Controlador do painel do Docente.
+ * Permite criar eventos, registar presenças, emitir certificados e ver
+ * estatísticas.
  */
 public class DocenteController implements Initializable {
 
@@ -41,8 +34,7 @@ public class DocenteController implements Initializable {
     private final CertificadoClientService certificadoService = new CertificadoClientService();
     private final LocalClientService localService = new LocalClientService();
 
-    //COMPONENTES DE UI - EVENTOS
-
+    // Tabela de eventos
     @FXML
     private TableView<EventoDTO> tblEventos;
     @FXML
@@ -54,8 +46,7 @@ public class DocenteController implements Initializable {
     @FXML
     private TableColumn<EventoDTO, Void> colEventoAcoes;
 
-    //COMPONENTES DE UI - PRESENÇAS
-
+    // Tabela de presenças
     @FXML
     private ComboBox<EventoDTO> cmbEventosPresencas;
     @FXML
@@ -69,8 +60,7 @@ public class DocenteController implements Initializable {
     @FXML
     private TableColumn<InscricaoDTO, Void> colInscritoAcoes;
 
-    //COMPONENTES DE UI - CERTIFICADOS
-
+    // Certificados
     @FXML
     private ComboBox<EventoDTO> cmbEventosCertificados;
     @FXML
@@ -84,8 +74,7 @@ public class DocenteController implements Initializable {
     @FXML
     private TableColumn<CertificadoDTO, String> colCertCodigo;
 
-    //COMPONENTES DE UI - ESTATÍSTICAS
-
+    // Estatísticas
     @FXML
     private ComboBox<EventoDTO> cmbEventosStats;
     @FXML
@@ -95,9 +84,6 @@ public class DocenteController implements Initializable {
 
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    /**
-     * Inicializa o controlador após o carregamento do FXML
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupEventosTable();
@@ -107,9 +93,6 @@ public class DocenteController implements Initializable {
         setupCombos();
     }
 
-    /**
-     * Configura a tabela de eventos com as colunas apropriadas
-     */
     private void setupEventosTable() {
         colEventoTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colEventoData.setCellValueFactory(c -> new SimpleStringProperty(
@@ -117,16 +100,34 @@ public class DocenteController implements Initializable {
         colEventoEstado.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getEstado() != null ? c.getValue().getEstado().toString() : ""));
 
-        // Coluna de ações para cada evento
         colEventoAcoes.setCellFactory(col -> new TableCell<>() {
             private final Button btnEditar = new Button("✏️");
             private final Button btnApagar = new Button("🗑️");
-            private final HBox hbox = new HBox(5, btnEditar, btnApagar);
+            private final MenuButton btnEstado = new MenuButton("📋");
+            private final HBox hbox = new HBox(5, btnEditar, btnEstado, btnApagar);
 
             {
                 btnEditar.getStyleClass().add("btn-icon");
                 btnApagar.getStyleClass().add("btn-icon");
+                btnEstado.getStyleClass().add("btn-icon");
                 btnApagar.setStyle("-fx-text-fill: #ef4444;");
+                btnEstado.setTooltip(new Tooltip("Alterar estado"));
+
+                MenuItem itemRascunho = new MenuItem("📝 Rascunho");
+                MenuItem itemPublicar = new MenuItem("🟢 Publicar");
+                MenuItem itemCancelar = new MenuItem("🔴 Cancelar");
+                MenuItem itemConcluir = new MenuItem("✅ Concluir");
+
+                itemRascunho.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                        gestaoeventos.entity.EstadoEvento.RASCUNHO));
+                itemPublicar.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                        gestaoeventos.entity.EstadoEvento.PUBLICADO));
+                itemCancelar.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                        gestaoeventos.entity.EstadoEvento.CANCELADO));
+                itemConcluir.setOnAction(e -> alterarEstadoEvento(getTableView().getItems().get(getIndex()),
+                        gestaoeventos.entity.EstadoEvento.CONCLUIDO));
+
+                btnEstado.getItems().addAll(itemRascunho, itemPublicar, itemCancelar, itemConcluir);
 
                 btnEditar.setOnAction(e -> editarEvento(getTableView().getItems().get(getIndex())));
                 btnApagar.setOnAction(e -> apagarEvento(getTableView().getItems().get(getIndex())));
@@ -140,9 +141,6 @@ public class DocenteController implements Initializable {
         });
     }
 
-    /**
-     * Configura a tabela de inscritos com ações de check-in e certificado
-     */
     private void setupInscritosTable() {
         colInscritoNome
                 .setCellValueFactory(c -> new SimpleStringProperty("User #" + c.getValue().getUtilizadorNumero()));
@@ -171,9 +169,6 @@ public class DocenteController implements Initializable {
         });
     }
 
-    /**
-     * Configura a tabela de certificados emitidos
-     */
     private void setupCertificadosTable() {
         colCertUtilizador.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getUtilizadorNome()));
         colCertData.setCellValueFactory(c -> new SimpleStringProperty(
@@ -181,9 +176,6 @@ public class DocenteController implements Initializable {
         colCertCodigo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCodigoVerificacao()));
     }
 
-    /**
-     * Configura os ComboBox de seleção de eventos
-     */
     private void setupCombos() {
         try {
             List<EventoDTO> eventos = eventoService.listarTodos();
@@ -201,10 +193,8 @@ public class DocenteController implements Initializable {
 
             cmbEventosPresencas.setItems(FXCollections.observableArrayList(eventos));
             cmbEventosPresencas.setConverter(converter);
-
             cmbEventosCertificados.setItems(FXCollections.observableArrayList(eventos));
             cmbEventosCertificados.setConverter(converter);
-
             cmbEventosStats.setItems(FXCollections.observableArrayList(eventos));
             cmbEventosStats.setConverter(converter);
         } catch (Exception e) {
@@ -212,14 +202,10 @@ public class DocenteController implements Initializable {
         }
     }
 
-    /**
-     * Carrega os eventos criados pelo docente atual
-     */
     @FXML
     public void carregarEventos() {
-        if (!UserSession.getInstance().isLoggedIn()) {
+        if (!UserSession.getInstance().isLoggedIn())
             return;
-        }
         try {
             Integer numero = UserSession.getInstance().getUser().getNumero();
             List<EventoDTO> eventos = eventoService.listarPorOrganizador(numero);
@@ -229,10 +215,6 @@ public class DocenteController implements Initializable {
         }
     }
 
-    /**
-     * Abre o diálogo para criar um novo evento.
-     * O docente pode criar eventos e será o organizador do mesmo
-     */
     @FXML
     public void criarEvento() {
         if (!UserSession.getInstance().isLoggedIn()) {
@@ -241,7 +223,6 @@ public class DocenteController implements Initializable {
         }
 
         try {
-            // Carregar locais disponíveis
             List<LocalDTO> locais = localService.listarTodos();
             if (locais.isEmpty()) {
                 mostrarAviso("Não existem locais disponíveis. Contacte o administrador.");
@@ -249,8 +230,6 @@ public class DocenteController implements Initializable {
             }
 
             Integer criadorNumero = UserSession.getInstance().getUser().getNumero();
-
-            // Mostrar diálogo de criação
             Optional<EventoCreateDTO> resultado = EventoDialogHelper.mostrarDialogoCriarEvento(locais, criadorNumero);
 
             resultado.ifPresent(dto -> {
@@ -258,7 +237,7 @@ public class DocenteController implements Initializable {
                 if (eventoCriado != null) {
                     mostrarSucesso("Evento '" + eventoCriado.getTitulo() + "' criado com sucesso!");
                     carregarEventos();
-                    setupCombos(); // Atualizar combos
+                    setupCombos();
                 } else {
                     mostrarErro("Falha ao criar o evento. Verifique os dados e tente novamente.");
                 }
@@ -268,17 +247,70 @@ public class DocenteController implements Initializable {
         }
     }
 
-    /**
-     * Abre o diálogo para editar um evento existente.
-     */
     private void editarEvento(EventoDTO evento) {
-        mostrarInfo("Funcionalidade de editar evento em desenvolvimento.");
-        // TODO: Implementar diálogo de edição
+        if (!UserSession.getInstance().isLoggedIn())
+            return;
+
+        try {
+            List<LocalDTO> locais = localService.listarTodos();
+            Integer docenteNumero = UserSession.getInstance().getUser().getNumero();
+
+            java.util.Optional<EventoCreateDTO> resultado = EventoDialogHelper.mostrarDialogoEditarEvento(
+                    evento, locais, docenteNumero);
+
+            resultado.ifPresent(dto -> {
+                EventoDTO atualizado = eventoService.atualizar(evento.getId(), dto);
+                if (atualizado != null) {
+                    mostrarSucesso("Evento '" + atualizado.getTitulo() + "' atualizado com sucesso!");
+                    carregarEventos();
+                    setupCombos();
+                } else {
+                    mostrarErro("Falha ao atualizar o evento.");
+                }
+            });
+        } catch (Exception e) {
+            mostrarErro("Erro ao editar evento: " + e.getMessage());
+        }
     }
 
-    /**
-     * Apaga um evento após confirmação.
-     */
+    private void alterarEstadoEvento(EventoDTO evento, gestaoeventos.entity.EstadoEvento novoEstado) {
+        if (evento.getEstado() == novoEstado) {
+            mostrarInfo("O evento já está no estado " + novoEstado + ".");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Alteração de Estado");
+        confirm.setHeaderText("Alterar estado do evento: " + evento.getTitulo());
+        confirm.setContentText("O estado atual é " + evento.getEstado() + ". Deseja alterar para " + novoEstado + "?");
+
+        confirm.showAndWait().filter(r -> r == ButtonType.OK).ifPresent(r -> {
+            try {
+                EventoCreateDTO dto = new EventoCreateDTO();
+                dto.setTitulo(evento.getTitulo());
+                dto.setDescricao(evento.getDescricao());
+                dto.setDataInicio(evento.getDataInicio());
+                dto.setDataFim(evento.getDataFim());
+                dto.setTipo(evento.getTipo());
+                dto.setMaxParticipantes(evento.getMaxParticipantes());
+                dto.setLocalId(evento.getLocalId());
+                dto.setCriadorNumero(evento.getCriadorNumero());
+                dto.setEstado(novoEstado);
+
+                EventoDTO atualizado = eventoService.atualizar(evento.getId(), dto);
+                if (atualizado != null) {
+                    mostrarSucesso("Estado alterado para " + novoEstado + " com sucesso!");
+                    carregarEventos();
+                    setupCombos();
+                } else {
+                    mostrarErro("Falha ao alterar o estado do evento.");
+                }
+            } catch (Exception e) {
+                mostrarErro("Erro ao alterar estado: " + e.getMessage());
+            }
+        });
+    }
+
     private void apagarEvento(EventoDTO evento) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmar Eliminação");
@@ -296,9 +328,6 @@ public class DocenteController implements Initializable {
         });
     }
 
-    /**
-     * Carrega os inscritos do evento selecionado.
-     */
     @FXML
     public void carregarInscritos() {
         EventoDTO selected = cmbEventosPresencas.getValue();
@@ -315,9 +344,6 @@ public class DocenteController implements Initializable {
         }
     }
 
-    /**
-     * Realiza o check-in de um inscrito.
-     */
     private void fazerCheckIn(InscricaoDTO inscricao) {
         try {
             inscricaoService.fazerCheckin(inscricao.getId());
@@ -328,25 +354,17 @@ public class DocenteController implements Initializable {
         }
     }
 
-    /**
-     * Emite um certificado de participação para um inscrito.
-     * O certificado emitido por docente tem nível de autoridade DOCENTE
-     */
     private void emitirCertificado(InscricaoDTO inscricao) {
         if (!inscricao.isCheckIn()) {
             mostrarAviso("O participante precisa fazer check-in primeiro.");
             return;
         }
-        if (!UserSession.getInstance().isLoggedIn()) {
+        if (!UserSession.getInstance().isLoggedIn())
             return;
-        }
 
         try {
             Integer emitidoPor = UserSession.getInstance().getUser().getNumero();
-            // Emitir certificado com tipo DOCENTE (nível superior)
-            CertificadoDTO cert = certificadoService.emitirComTipo(
-                    inscricao.getId(),
-                    emitidoPor,
+            CertificadoDTO cert = certificadoService.emitirComTipo(inscricao.getId(), emitidoPor,
                     TipoCertificado.DOCENTE);
 
             if (cert != null) {
@@ -359,10 +377,6 @@ public class DocenteController implements Initializable {
         }
     }
 
-    /**
-     * Emite certificados em massa para todos os participantes com check-in.
-     * Certificados emitidos por docente têm nível de autoridade superior.
-     */
     @FXML
     public void emitirCertificadosEmMassa() {
         EventoDTO selected = cmbEventosCertificados.getValue();
@@ -370,20 +384,16 @@ public class DocenteController implements Initializable {
             mostrarAviso("Selecione um evento.");
             return;
         }
-        if (!UserSession.getInstance().isLoggedIn()) {
+        if (!UserSession.getInstance().isLoggedIn())
             return;
-        }
 
         try {
             Integer emitidoPor = UserSession.getInstance().getUser().getNumero();
-            String resultado = certificadoService.emitirEmMassaComTipo(
-                    selected.getId(),
-                    emitidoPor,
+            String resultado = certificadoService.emitirEmMassaComTipo(selected.getId(), emitidoPor,
                     TipoCertificado.DOCENTE);
             lblResultadoCertificados.setText(resultado);
             mostrarSucesso("Certificados de Docente emitidos!");
 
-            // Atualizar lista de certificados emitidos
             List<CertificadoDTO> certs = certificadoService.listarPorEvento(selected.getId());
             tblCertificadosEmitidos.setItems(FXCollections.observableArrayList(certs));
         } catch (Exception e) {
@@ -391,9 +401,6 @@ public class DocenteController implements Initializable {
         }
     }
 
-    /**
-     * Carrega e exibe estatísticas do evento selecionado.
-     */
     @FXML
     public void verEstatisticas() {
         EventoDTO selected = cmbEventosStats.getValue();
@@ -418,37 +425,32 @@ public class DocenteController implements Initializable {
         }
     }
 
-    //MÉTODOS DE NOTIFICAÇÃO
-
+    // Métodos de notificação
     private Window getWindow() {
         return tblEventos.getScene() != null ? tblEventos.getScene().getWindow() : null;
     }
 
     private void mostrarSucesso(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.sucesso(window, mensagem);
-        }
     }
 
     private void mostrarErro(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.erro(window, mensagem);
-        }
     }
 
     private void mostrarAviso(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.aviso(window, mensagem);
-        }
     }
 
     private void mostrarInfo(String mensagem) {
         Window window = getWindow();
-        if (window != null) {
+        if (window != null)
             ToastNotification.info(window, mensagem);
-        }
     }
 }

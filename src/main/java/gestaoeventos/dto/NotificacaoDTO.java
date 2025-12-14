@@ -1,25 +1,28 @@
 
 package gestaoeventos.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import gestaoeventos.entity.TipoNotificacao;
 
 import java.time.LocalDateTime;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NotificacaoDTO {
 
-    private Integer id;
-    private Integer destinatarioNumero;
-    private Integer eventoId;
-    private TipoNotificacao tipo;
-    private String conteudo;
-    private String canal;
-    private boolean lida;
-    private LocalDateTime dataCriacao;
+	private Integer id;
+	private Integer destinatarioNumero;
+	private Integer eventoId;
+	private TipoNotificacao tipo;
+	private String conteudo;
+	private String canal;
+	private boolean lida;
+	private LocalDateTime dataCriacao;
 
-    public NotificacaoDTO() {}
+	public NotificacaoDTO() {
+	}
 
-    // getters e setters ...
-    
+	// getters e setters ...
+
 	public Integer getId() {
 		return id;
 	}
@@ -84,5 +87,33 @@ public class NotificacaoDTO {
 		this.dataCriacao = dataCriacao;
 	}
 
-    
+	private LocalDateTime dataInicioExibicao;
+	private LocalDateTime dataFimExibicao;
+
+	public LocalDateTime getDataInicioExibicao() {
+		return dataInicioExibicao;
+	}
+
+	public void setDataInicioExibicao(LocalDateTime dataInicioExibicao) {
+		this.dataInicioExibicao = dataInicioExibicao;
+	}
+
+	public LocalDateTime getDataFimExibicao() {
+		return dataFimExibicao;
+	}
+
+	public void setDataFimExibicao(LocalDateTime dataFimExibicao) {
+		this.dataFimExibicao = dataFimExibicao;
+	}
+
+	public boolean isVisivelAgora() {
+		LocalDateTime agora = LocalDateTime.now();
+		if (dataInicioExibicao != null && agora.isBefore(dataInicioExibicao)) {
+			return false;
+		}
+		if (dataFimExibicao != null && agora.isAfter(dataFimExibicao)) {
+			return false;
+		}
+		return true;
+	}
 }
