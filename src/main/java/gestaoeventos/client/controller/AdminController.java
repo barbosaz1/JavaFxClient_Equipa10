@@ -28,6 +28,7 @@ public class AdminController implements Initializable {
     private final LocalClientService localService = new LocalClientService();
     private final InscricaoService inscricaoService = new InscricaoService();
     private final LogAuditoriaClientService logService = new LogAuditoriaClientService();
+    private final CertificadoClientService certificadoService = new CertificadoClientService();
 
     @FXML
     private TableView<UtilizadorDTO> tblUtilizadores;
@@ -121,6 +122,24 @@ public class AdminController implements Initializable {
     @FXML
     private Label lblResultadoCheckin;
 
+    // Certificados
+    @FXML
+    private ComboBox<EventoDTO> cmbEventosCertAdmin;
+    @FXML
+    private Label lblResultadoCertificadosAdmin;
+    @FXML
+    private TableView<CertificadoDTO> tblCertificadosAdmin;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminUtilizador;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminEvento;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminTipo;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminData;
+    @FXML
+    private TableColumn<CertificadoDTO, String> colCertAdminCodigo;
+
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
@@ -130,6 +149,7 @@ public class AdminController implements Initializable {
         setupLocaisTable();
         setupInscricoesTable();
         setupLogsTable();
+        setupCertificadosTable();
         carregarUtilizadores();
     }
 
@@ -546,6 +566,97 @@ public class AdminController implements Initializable {
         colLogData.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getDataHora() != null ? c.getValue().getDataHora().format(DTF) : ""));
         colLogMotivo.setCellValueFactory(new PropertyValueFactory<>("motivo"));
+    }
+
+    private void setupCertificadosTable() {
+        // Configurar combo de eventos para certificados
+        if (cmbEventosCertAdmin != null) {
+            try {
+                List<EventoDTO> eventos = eventoService.listarTodos();
+                cmbEventosCertAdmin.setItems(FXCollections.observableArrayList(eventos));
+                cmbEventosCertAdmin.setConverter(new javafx.util.StringConverter<>() {
+                    @Override
+                    public String toString(EventoDTO e) {
+                        return e != null ? e.getTitulo() : "";
+                    }
+
+                    @Override
+                    public EventoDTO fromString(String s) {
+                        return null;
+                    }
+                });
+
+                // Ao selecionar evento, carregar certificados
+                cmbEventosCertAdmin.valueProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null) {
+                        carregarCertificadosEvento(newVal.getId());
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Erro ao configurar combo certificados: " + e.getMessage());
+            }
+        }
+
+        // Configurar colunas da tabela
+        if (colCertAdminUtilizador != null) {
+            colCertAdminUtilizador.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getUtilizadorNome() != null ? c.getValue().getUtilizadorNome()
+                            : "User #" + c.getValue().getUtilizadorNumero()));
+        }
+        if (colCertAdminEvento != null) {
+            colCertAdminEvento.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getEventoTitulo() != null ? c.getValue().getEventoTitulo() : ""));
+        }
+        if (colCertAdminTipo != null) {
+            colCertAdminTipo.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getTipoDescricao() != null ? c.getValue().getTipoDescricao()
+                            : (c.getValue().getTipo() != null ? c.getValue().getTipo().getDescricao() : "Presenca")));
+        }
+        if (colCertAdminData != null) {
+            colCertAdminData.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getDataEmissao() != null ? c.getValue().getDataEmissao().format(DTF) : ""));
+        }
+        if (colCertAdminCodigo != null) {
+            colCertAdminCodigo.setCellValueFactory(c -> new SimpleStringProperty(
+                    c.getValue().getCodigoVerificacao() != null ? c.getValue().getCodigoVerificacao() : ""));
+        }
+    }
+
+    private void carregarCertificadosEvento(Integer eventoId) {
+        if (tblCertificadosAdmin == null)
+            return;
+        try {
+            List<CertificadoDTO> certs = certificadoService.listarPorEvento(eventoId);
+            tblCertificadosAdmin.setItems(FXCollections.observableArrayList(certs));
+        } catch (Exception e) {
+            mostrarErro("Erro ao carregar certificados: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void emitirCertificadosEmMassa() {
+        EventoDTO selected = cmbEventosCertAdmin != null ? cmbEventosCertAdmin.getValue() : null;
+        if (selected == null) {
+            mostrarAviso("Selecione um evento.");
+            return;
+        }
+        if (!gestaoeventos.client.model.UserSession.getInstance().isLoggedIn())
+            return;
+
+        try {
+            Integer emitidoPor = gestaoeventos.client.model.UserSession.getInstance().getUser().getNumero();
+            // Admin emite certificado tipo PRESENCA (basico)
+            String resultado = certificadoService.emitirEmMassaComTipo(
+                    selected.getId(), emitidoPor, gestaoeventos.entity.TipoCertificado.PRESENCA);
+
+            if (lblResultadoCertificadosAdmin != null) {
+                lblResultadoCertificadosAdmin.setText(resultado);
+            }
+            mostrarSucesso("Certificados de Presenca emitidos!");
+            carregarCertificadosEvento(selected.getId());
+        } catch (Exception e) {
+            mostrarErro("Erro ao emitir certificados: " + e.getMessage());
+        }
     }
 
     @FXML
