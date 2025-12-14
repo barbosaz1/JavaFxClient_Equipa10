@@ -267,9 +267,11 @@ public class AdminController implements Initializable {
     private Dialog<UtilizadorCreateDTO> createUtilizadorDialog(UtilizadorDTO existing) {
         Dialog<UtilizadorCreateDTO> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Novo Utilizador" : "Editar Utilizador");
+        dialog.setHeaderText(
+                existing == null ? "Preencha os dados do novo utilizador" : "Altere os dados do utilizador");
 
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #1E1E1E;");
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
 
         TextField tfNumero = new TextField();
         tfNumero.setPromptText("Número do utilizador");
@@ -278,7 +280,7 @@ public class AdminController implements Initializable {
         TextField tfEmail = new TextField();
         tfEmail.setPromptText("email@exemplo.com");
         PasswordField tfPassword = new PasswordField();
-        tfPassword.setPromptText("Password");
+        tfPassword.setPromptText(existing == null ? "Password" : "Nova password (deixe vazio para manter)");
         ComboBox<PerfilUtilizador> cbPerfil = new ComboBox<>(
                 FXCollections.observableArrayList(PerfilUtilizador.values()));
 
@@ -291,37 +293,19 @@ public class AdminController implements Initializable {
         }
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
 
-        String labelStyle = "-fx-text-fill: #E0E0E0; -fx-font-weight: bold;";
-        String inputStyle = "-fx-background-color: #2A2A2A; -fx-text-fill: white; -fx-prompt-text-fill: #6B7280;";
-
-        tfNumero.setStyle(inputStyle);
-        tfNome.setStyle(inputStyle);
-        tfEmail.setStyle(inputStyle);
-        tfPassword.setStyle(inputStyle);
-
-        Label lblNumero = new Label("Número:");
-        lblNumero.setStyle(labelStyle);
-        Label lblNome = new Label("Nome:");
-        lblNome.setStyle(labelStyle);
-        Label lblEmail = new Label("Email:");
-        lblEmail.setStyle(labelStyle);
-        Label lblPassword = new Label("Password:");
-        lblPassword.setStyle(labelStyle);
-        Label lblPerfil = new Label("Perfil:");
-        lblPerfil.setStyle(labelStyle);
-
-        grid.add(lblNumero, 0, 0);
+        grid.add(new Label("Número:"), 0, 0);
         grid.add(tfNumero, 1, 0);
-        grid.add(lblNome, 0, 1);
+        grid.add(new Label("Nome:"), 0, 1);
         grid.add(tfNome, 1, 1);
-        grid.add(lblEmail, 0, 2);
+        grid.add(new Label("Email:"), 0, 2);
         grid.add(tfEmail, 1, 2);
-        grid.add(lblPassword, 0, 3);
+        grid.add(new Label("Password:"), 0, 3);
         grid.add(tfPassword, 1, 3);
-        grid.add(lblPerfil, 0, 4);
+        grid.add(new Label("Perfil:"), 0, 4);
         grid.add(cbPerfil, 1, 4);
 
         dialogPane.setContent(grid);
@@ -474,9 +458,10 @@ public class AdminController implements Initializable {
     private Dialog<LocalCreateDTO> createLocalDialog(LocalDTO existing) {
         Dialog<LocalCreateDTO> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Novo Local" : "Editar Local");
+        dialog.setHeaderText(existing == null ? "Preencha os dados do novo local" : "Altere os dados do local");
 
         DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #1E1E1E;");
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
 
         TextField tfNome = new TextField();
         tfNome.setPromptText("Nome do local");
@@ -485,11 +470,6 @@ public class AdminController implements Initializable {
         TextField tfMorada = new TextField();
         tfMorada.setPromptText("Morada completa");
 
-        String inputStyle = "-fx-background-color: #2A2A2A; -fx-text-fill: white; -fx-prompt-text-fill: #6B7280;";
-        tfNome.setStyle(inputStyle);
-        tfCapacidade.setStyle(inputStyle);
-        tfMorada.setStyle(inputStyle);
-
         if (existing != null) {
             tfNome.setText(existing.getNome());
             tfCapacidade.setText(String.valueOf(existing.getCapacidade()));
@@ -497,22 +477,15 @@ public class AdminController implements Initializable {
         }
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
 
-        String labelStyle = "-fx-text-fill: #E0E0E0; -fx-font-weight: bold;";
-        Label lblNome = new Label("Nome:");
-        lblNome.setStyle(labelStyle);
-        Label lblCapacidade = new Label("Capacidade:");
-        lblCapacidade.setStyle(labelStyle);
-        Label lblMorada = new Label("Morada:");
-        lblMorada.setStyle(labelStyle);
-
-        grid.add(lblNome, 0, 0);
+        grid.add(new Label("Nome:"), 0, 0);
         grid.add(tfNome, 1, 0);
-        grid.add(lblCapacidade, 0, 1);
+        grid.add(new Label("Capacidade:"), 0, 1);
         grid.add(tfCapacidade, 1, 1);
-        grid.add(lblMorada, 0, 2);
+        grid.add(new Label("Morada:"), 0, 2);
         grid.add(tfMorada, 1, 2);
 
         dialogPane.setContent(grid);
