@@ -353,13 +353,16 @@ public class GestorController implements Initializable {
         dialog.setTitle("Editar Anuncio");
         dialog.setHeaderText("Editar conteudo e periodo de exibicao");
 
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
+
         ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+        dialogPane.getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setStyle("-fx-padding: 20;");
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
 
         TextArea txtConteudo = new TextArea(anuncio.getConteudo());
         txtConteudo.setPrefRowCount(3);
@@ -468,7 +471,91 @@ public class GestorController implements Initializable {
 
     @FXML
     public void novoLocal() {
-        mostrarInfo("Para criar novos locais, utilize o painel Admin.");
+        Dialog<LocalCreateDTO> dialog = createLocalDialog(null);
+        dialog.showAndWait().ifPresent(dto -> {
+            LocalDTO created = localService.criar(dto);
+            if (created != null) {
+                mostrarSucesso("Local '" + created.getNome() + "' criado com sucesso!");
+                carregarLocais();
+            } else {
+                mostrarErro("Falha ao criar o local. Verifique os dados.");
+            }
+        });
+    }
+
+    private Dialog<LocalCreateDTO> createLocalDialog(LocalDTO existing) {
+        Dialog<LocalCreateDTO> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Novo Local" : "Editar Local");
+        dialog.setHeaderText(existing == null ? "Preencha os dados do novo local" : "Altere os dados do local");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/css/app-theme.css").toExternalForm());
+
+        TextField tfNome = new TextField();
+        tfNome.setPromptText("Nome do local (ex: Auditório Principal)");
+        TextField tfCapacidade = new TextField();
+        tfCapacidade.setPromptText("Capacidade máxima (ex: 200)");
+        TextField tfMorada = new TextField();
+        tfMorada.setPromptText("Morada completa");
+
+        if (existing != null) {
+            tfNome.setText(existing.getNome());
+            tfCapacidade.setText(String.valueOf(existing.getCapacidade()));
+            tfMorada.setText(existing.getMorada());
+        }
+
+        GridPane grid = new GridPane();
+        grid.setHgap(16);
+        grid.setVgap(16);
+        grid.setPadding(new javafx.geometry.Insets(20));
+
+        grid.add(new Label("Nome:"), 0, 0);
+        grid.add(tfNome, 1, 0);
+        grid.add(new Label("Capacidade:"), 0, 1);
+        grid.add(tfCapacidade, 1, 1);
+        grid.add(new Label("Morada:"), 0, 2);
+        grid.add(tfMorada, 1, 2);
+
+        // Expandir campos
+        tfNome.setPrefWidth(300);
+        tfCapacidade.setPrefWidth(300);
+        tfMorada.setPrefWidth(300);
+
+        dialogPane.setContent(grid);
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Validação antes de fechar
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            if (tfNome.getText().isBlank()) {
+                mostrarAviso("O nome do local é obrigatório.");
+                event.consume();
+                return;
+            }
+            try {
+                Integer.parseInt(tfCapacidade.getText());
+            } catch (NumberFormatException e) {
+                mostrarAviso("A capacidade deve ser um número válido.");
+                event.consume();
+            }
+        });
+
+        dialog.setResultConverter(btn -> {
+            if (btn == ButtonType.OK) {
+                try {
+                    LocalCreateDTO dto = new LocalCreateDTO();
+                    dto.setNome(tfNome.getText().trim());
+                    dto.setCapacidade(Integer.parseInt(tfCapacidade.getText().trim()));
+                    dto.setMorada(tfMorada.getText().trim());
+                    return dto;
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        return dialog;
     }
 
     @FXML
