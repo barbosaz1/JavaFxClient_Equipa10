@@ -103,57 +103,57 @@ public class MainController implements Initializable {
     @FXML
     void navOverview() {
         setActive(btnOverview);
-        PageNavigator.loadPage("Overview.fxml");
+        PageNavigator.loadPage("main/Overview.fxml");
     }
 
     @FXML
     void navEventos() {
         setActive(btnEventos);
-        PageNavigator.loadPage("Eventos.fxml");
+        PageNavigator.loadPage("eventos/Eventos.fxml");
     }
 
     @FXML
     void navInscricoes() {
         setActive(btnInscricoes);
-        PageNavigator.loadPage("Inscricoes.fxml");
+        PageNavigator.loadPage("eventos/Inscricoes.fxml");
     }
 
     @FXML
     void navCalendario() {
         setActive(btnCalendario);
-        PageNavigator.loadPage("Calendario.fxml");
+        PageNavigator.loadPage("eventos/Calendario.fxml");
     }
 
     @FXML
     void navCertificados() {
         setActive(btnCertificados);
-        PageNavigator.loadPage("Certificados.fxml");
+        PageNavigator.loadPage("eventos/Certificados.fxml");
     }
 
     // --- Navegação Staff ---
     @FXML
     void navCheckIn() {
         setActive(btnCheckIn);
-        PageNavigator.loadPage("CheckIn.fxml");
+        PageNavigator.loadPage("eventos/CheckIn.fxml");
     }
 
     @FXML
     void navDocentePanel() {
         setActive(btnDocentePanel);
-        PageNavigator.loadPage("DocentePanel.fxml");
+        PageNavigator.loadPage("panels/DocentePanel.fxml");
     }
 
     @FXML
     void navGestorPanel() {
         setActive(btnGestorPanel);
-        PageNavigator.loadPage("GestorPanel.fxml");
+        PageNavigator.loadPage("panels/GestorPanel.fxml");
     }
 
     // --- Navegação Admin ---
     @FXML
     void navAdminPanel() {
         setActive(btnAdminPanel);
-        PageNavigator.loadPage("AdminPanel.fxml");
+        PageNavigator.loadPage("panels/AdminPanel.fxml");
     }
 
     private void setActive(Button btn) {
@@ -173,7 +173,7 @@ public class MainController implements Initializable {
     void logout() {
         UserSession.getInstance().logout();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/Login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) rootPane.getScene().getWindow();
 
