@@ -31,7 +31,7 @@ public class InscricaoService extends ApiClient {
             HttpRequest request = getBuilder("/inscricoes/utilizador/" + numeroUtilizador).build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return mapper.readValue(response.body(), new TypeReference<List<InscricaoDTO>>() {
+                return mapper.readValue(response.body(), new TypeReference<List<InscricaoDTO>>() { // TypeReference - para preservar o tipo em Json
                 });
             }
             logError("listarPorUtilizador", response.statusCode(), response.body());
