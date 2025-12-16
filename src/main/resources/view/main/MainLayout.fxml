@@ -40,7 +40,7 @@
             <Button fx:id="btnCalendario" onAction="#navCalendario" text="📆  Agenda / Calendário" maxWidth="Infinity" styleClass="nav-btn"/>
             <Button fx:id="btnCertificados" onAction="#navCertificados" text="📜  Meus Certificados" maxWidth="Infinity" styleClass="nav-btn"/>
             
-            <!-- Secção Staff (Docente, Gestor, Admin) -->
+            <!--(Docente, Gestor, Admin) -->
             <Separator fx:id="separatorStaff" visible="false" managed="false" style="-fx-background-color: -color-border-subtle;" />
             <Label fx:id="lblStaff" text="GESTÃO" visible="false" managed="false" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: -color-text-muted; -fx-padding: 10 0 5 0;"/>
             
