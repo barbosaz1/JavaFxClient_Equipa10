@@ -184,11 +184,11 @@ Base URL: `http://localhost:8080/api`
 
 ## 🎨 Interface
 
-A interface foi desenhada com um tema **dark premium** moderno:
+A interface foi desenhada com um tema **dark** :
 - Paleta de cores escuras 
 - Gradientes roxos 
-- Animações suaves em botões e transições
-- Cards com sombras e bordas subtis
+- Animações suaves
+- Cards com sombras
 
 ---
 
