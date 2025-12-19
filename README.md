@@ -47,7 +47,6 @@ Sistema completo de gestão de eventos académicos para a Universidade Portucale
 ### Backend (Spring Boot)
 - **Spring Boot 3.x**
 - **Spring Data JPA**
-- **H2/PostgreSQL**
 - **API REST**
 
 ---
